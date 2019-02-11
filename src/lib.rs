@@ -2,8 +2,9 @@ use serde_json;
 use std::fs;
 use std::error::Error;
 
-struct Cinema {
-    data: serde_json::Value
+pub struct Cinema {
+    pub name: String
+    // data: serde_json::Value
 }
 
 impl Cinema {
@@ -12,16 +13,23 @@ impl Cinema {
 
         let v: serde_json::Value = serde_json::from_str(&contents)?;
 
+        let cinema_data = &v["Calendar"]["Cinemas"][0];
+
+        let name_field = &cinema_data["CinemaName"].as_str().unwrap();
+
         Ok(Cinema {
-            data: v["Calendar"]["Cinemas"][0]
+            name: name_field.to_string()
         })
     }
 
-    pub fn name(&self) -> Result<String, Box<dyn Error>> {
-        let field = self.data["CinemaName"];
+    // pub fn name(&self) -> String {
+        // let field = self.data["CinemaName"];
 
-        let s = field.as_str()?;
-
-        Ok(s.to_string())
-    }
+        // String::from(
+            // field
+                // .as_str()
+                // .unwrap()
+                // .to_string()
+        // )
+    // }
 }

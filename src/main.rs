@@ -1,14 +1,12 @@
-use serde_json;
-use std::fs;
-use std::error::Error;
-// use std::result;
+use alamo_movies;
+use alamo_movies::Cinema;
 
 fn main() {
     // first, read the file into a string
     let path = "0002.calendar.json";
 
     let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
-    let name = cinema.name().expect("Cannot find name");
+    let name = cinema.name;
 
     // let data = get_data(&path).expect("Whoops!");
 
