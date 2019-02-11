@@ -3,8 +3,9 @@ use std::fs;
 use std::error::Error;
 
 pub struct Cinema {
-    pub name: String
-    // data: serde_json::Value
+    pub id: String,
+    pub name: String,
+    pub slug: String,
 }
 
 impl Cinema {
@@ -13,12 +14,16 @@ impl Cinema {
 
         let v: serde_json::Value = serde_json::from_str(&contents)?;
 
-        let cinema_data = &v["Calendar"]["Cinemas"][0];
+        let data = &v["Calendar"]["Cinemas"][0];
 
-        let name_field = &cinema_data["CinemaName"].as_str().unwrap();
+        let name = cinema_name_from(&data).unwrap();
+        let id = cinema_id_from(&data).unwrap();
+        let slug = cinema_slug_from(&data).unwrap();
 
         Ok(Cinema {
-            name: name_field.to_string()
+            id: id.to_string(),
+            name: name.to_string(),
+            slug: slug.to_string(),
         })
     }
 
@@ -32,4 +37,16 @@ impl Cinema {
                 // .to_string()
         // )
     // }
+}
+
+fn cinema_name_from(data: &serde_json::Value) -> Option<&str> {
+    data["CinemaName"].as_str()
+}
+
+fn cinema_id_from(data: &serde_json::Value) -> Option<&str> {
+    data["CinemaId"].as_str()
+}
+
+fn cinema_slug_from(data: &serde_json::Value) -> Option<&str> {
+    data["CinemaSlug"].as_str()
 }

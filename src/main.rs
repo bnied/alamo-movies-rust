@@ -6,7 +6,6 @@ fn main() {
     let path = "0002.calendar.json";
 
     let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
-    let name = cinema.name;
 
     // let data = get_data(&path).expect("Whoops!");
 
@@ -16,7 +15,7 @@ fn main() {
     // let jsonname = &cinema["CinemaName"];
     // let name = jsonname.as_str().expect("Cannot find");
 
-    println!("read: {}", name);
+    println!("read: {} / {} - {}", cinema.name, cinema.id, cinema.slug);
 }
 
 // fn get_data(path: &str) -> Result<String, Box<dyn Error>> {
