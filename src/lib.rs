@@ -6,6 +6,13 @@ pub struct Cinema {
     pub id: String,
     pub name: String,
     pub slug: String,
+    pub market: Market,
+}
+
+pub struct Market {
+    pub id: String,
+    pub name: String,
+    pub slug: String,
 }
 
 impl Cinema {
@@ -20,10 +27,19 @@ impl Cinema {
         let id = cinema_id_from(&data).unwrap();
         let slug = cinema_slug_from(&data).unwrap();
 
+        let market_name = market_name_from(&data).unwrap();
+        let market_id = market_id_from(&data).unwrap();
+        let market_slug = market_slug_from(&data).unwrap();
+
         Ok(Cinema {
             id: id.to_string(),
             name: name.to_string(),
             slug: slug.to_string(),
+            market: Market {
+                id: market_id.to_string(),
+                name: market_name.to_string(),
+                slug: market_slug.to_string(),
+            }
         })
     }
 
@@ -49,4 +65,16 @@ fn cinema_id_from(data: &serde_json::Value) -> Option<&str> {
 
 fn cinema_slug_from(data: &serde_json::Value) -> Option<&str> {
     data["CinemaSlug"].as_str()
+}
+
+fn market_name_from(data: &serde_json::Value) -> Option<&str> {
+    data["MarketName"].as_str()
+}
+
+fn market_id_from(data: &serde_json::Value) -> Option<&str> {
+    data["MarketId"].as_str()
+}
+
+fn market_slug_from(data: &serde_json::Value) -> Option<&str> {
+    data["MarketSlug"].as_str()
 }

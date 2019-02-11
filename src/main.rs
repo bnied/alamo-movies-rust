@@ -15,7 +15,8 @@ fn main() {
     // let jsonname = &cinema["CinemaName"];
     // let name = jsonname.as_str().expect("Cannot find");
 
-    println!("read: {} / {} - {}", cinema.name, cinema.id, cinema.slug);
+    println!("cinema: {} / {} - {}", cinema.name, cinema.id, cinema.slug);
+    println!("market: {} / {} - {}", cinema.market.name, cinema.market.id, cinema.market.slug);
 }
 
 // fn get_data(path: &str) -> Result<String, Box<dyn Error>> {
