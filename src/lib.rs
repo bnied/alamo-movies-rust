@@ -23,13 +23,17 @@ impl Cinema {
 
         let data = &v["Calendar"]["Cinemas"][0];
 
-        let name = cinema_name_from(&data).unwrap();
-        let id = cinema_id_from(&data).unwrap();
-        let slug = cinema_slug_from(&data).unwrap();
+        Cinema::from_calendar_json(data)
+    }
 
-        let market_name = market_name_from(&data).unwrap();
-        let market_id = market_id_from(&data).unwrap();
-        let market_slug = market_slug_from(&data).unwrap();
+    pub fn from_calendar_json(json: &serde_json::Value) -> Result<Cinema, Box<dyn Error>> {
+        let name = cinema_name_from(json).unwrap();
+        let id = cinema_id_from(json).unwrap();
+        let slug = cinema_slug_from(json).unwrap();
+
+        let market_name = market_name_from(json).unwrap();
+        let market_id = market_id_from(json).unwrap();
+        let market_slug = market_slug_from(json).unwrap();
 
         Ok(Cinema {
             id: id.to_string(),
