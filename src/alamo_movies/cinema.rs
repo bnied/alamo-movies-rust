@@ -36,16 +36,6 @@ impl Cinema {
         })
     }
 
-    // pub fn name(&self) -> String {
-        // let field = self.data["CinemaName"];
-
-        // String::from(
-            // field
-                // .as_str()
-                // .unwrap()
-                // .to_string()
-        // )
-    // }
 }
 
 fn cinema_name_from(data: &serde_json::Value) -> Option<&str> {
