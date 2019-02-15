@@ -1,5 +1,5 @@
-use alamo_movies;
-use alamo_movies::Cinema;
+mod alamo_movies;
+use crate::alamo_movies::cinema::Cinema;
 
 fn main() {
     // first, read the file into a string
