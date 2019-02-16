@@ -9,5 +9,11 @@ fn main() {
 
     println!("cinema: {} / {} - {}", cinema.name, cinema.id, cinema.slug);
     println!("market: {} / {} - {}", cinema.market.name, cinema.market.id, cinema.market.slug);
+
+    println!("Movies:");
+
+    for movie in cinema.movies.iter() {
+        println!("  - {}", movie.name);
+    }
 }
 

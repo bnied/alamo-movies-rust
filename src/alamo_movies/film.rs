@@ -1,6 +1,7 @@
 use std::error::Error;
+use serde_json::Value;
 
-pub struct Movie {
+pub struct Film {
     pub id: String,
     pub name: String,
     pub year: String,
@@ -9,8 +10,8 @@ pub struct Movie {
     pub slug: String
 }
 
-impl Movie {
-    pub fn from_json(json: &serde_json::Value) -> Result<Movie, Box<dyn Error>> {
+impl Film {
+    pub fn from_json(json: &serde_json::Value) -> Result<Film, Box<dyn Error>> {
         let id = id_from(json).unwrap();
         let name = name_from(json).unwrap();
         let year = year_from(json).unwrap();
@@ -18,7 +19,7 @@ impl Movie {
         let runtime = runtime_from(json).unwrap();
         let slug = slug_from(json).unwrap();
 
-        Ok(Movie {
+        Ok(Film {
             id: id.to_string(),
             name: name.to_string(),
             year: year.to_string(),
@@ -26,6 +27,28 @@ impl Movie {
             runtime: runtime.to_string(),
             slug: slug.to_string(),
         })
+    }
+
+    pub fn movies_from_calendar(json: &serde_json::Value) -> Result<Vec<Film>, Box<dyn Error>> {
+        let mut results: Vec<Film> = Vec::new();
+
+        // iterate over the Months > Weeks > Days > Films
+        for month in json["Months"].as_array().unwrap().iter() {
+            for week in month["Weeks"].as_array().unwrap().iter() {
+                for day in week["Days"].as_array().unwrap().iter() {
+                    match day["Films"].as_array() {
+                        None => {},
+                        Some(films) => {
+                            for film in films {
+                                results.push(Film::from_json(film)?);
+                            }
+                        },
+                    };
+                }
+            }
+        }
+
+        Ok(results)
     }
 }
 

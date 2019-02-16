@@ -2,14 +2,14 @@ use std::fs;
 use std::error::Error;
 
 use super::market::Market;
-use super::movie::Movie;
+use super::film::Film;
 
 pub struct Cinema {
     pub id: String,
     pub name: String,
     pub slug: String,
     pub market: Market,
-    pub movies: Vec<Movie>,
+    pub movies: Vec<Film>,
 }
 
 impl Cinema {
@@ -35,7 +35,7 @@ impl Cinema {
             name: name.to_string(),
             slug: slug.to_string(),
             market,
-            movies: Vec::new(),
+            movies: Film::movies_from_calendar(json)?,
         })
     }
 
