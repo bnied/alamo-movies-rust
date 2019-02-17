@@ -12,7 +12,7 @@ fn main() {
 
     println!("Movies:");
 
-    for movie in cinema.movies.iter() {
+    for movie in cinema.films.iter() {
         println!("  - {}", movie.name);
     }
 }

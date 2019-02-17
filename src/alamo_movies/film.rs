@@ -1,5 +1,6 @@
 use std::error::Error;
 use serde_json::Value;
+use std::collections::HashSet;
 
 pub struct Film {
     pub id: String,
@@ -29,8 +30,14 @@ impl Film {
         })
     }
 
-    pub fn movies_from_calendar(json: &serde_json::Value) -> Result<Vec<Film>, Box<dyn Error>> {
+    fn get_array<'a>(json: &'a Value, key: &str) -> Option<&'a Vec<Value>> {
+        json[key].as_array()
+    }
+
+    pub fn films_from_calendar(json: &serde_json::Value) -> Result<Vec<Film>, Box<dyn Error>> {
         let mut results: Vec<Film> = Vec::new();
+
+        let mut film_ids = HashSet::new();
 
         // iterate over the Months > Weeks > Days > Films
         for month in json["Months"].as_array().unwrap().iter() {
@@ -39,8 +46,13 @@ impl Film {
                     match day["Films"].as_array() {
                         None => {},
                         Some(films) => {
-                            for film in films {
-                                results.push(Film::from_json(film)?);
+                            for film_json in films {
+                                let film = Film::from_json(film_json)?;
+
+                                if film_ids.insert(film.id.to_string()) {
+                                    results.push(film);
+                                }
+
                             }
                         },
                     };

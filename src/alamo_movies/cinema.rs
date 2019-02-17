@@ -9,7 +9,7 @@ pub struct Cinema {
     pub name: String,
     pub slug: String,
     pub market: Market,
-    pub movies: Vec<Film>,
+    pub films: Vec<Film>,
 }
 
 impl Cinema {
@@ -35,7 +35,7 @@ impl Cinema {
             name: name.to_string(),
             slug: slug.to_string(),
             market,
-            movies: Film::movies_from_calendar(json)?,
+            films: Film::films_from_calendar(json)?,
         })
     }
 
