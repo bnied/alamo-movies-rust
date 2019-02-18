@@ -1,6 +1,9 @@
 mod alamo_movies;
 use crate::alamo_movies::cinema::Cinema;
 
+#[macro_use] extern crate lazy_static;
+extern crate regex;
+
 fn main() {
     // first, read the file into a string
     let path = "0002.calendar.json";
@@ -13,7 +16,7 @@ fn main() {
     println!("Movies:");
 
     for movie in cinema.films.iter() {
-        println!("  - {}", movie.name);
+        println!("  - {} ({})", movie.name, movie.rating);
     }
 }
 

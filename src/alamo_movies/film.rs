@@ -2,19 +2,22 @@ use std::error::Error;
 use serde_json::Value;
 use std::collections::HashSet;
 
+use regex::Regex;
+
 pub struct Film {
     pub id: String,
     pub name: String,
     pub year: String,
     pub rating: String,
     pub runtime: String,
-    pub slug: String
+    pub slug: String,
+    pub show_type: String, // Things like Terror Tuesday or Movie Party
 }
 
 impl Film {
     pub fn from_json(json: &serde_json::Value) -> Result<Film, Box<dyn Error>> {
         let id = id_from(json).unwrap();
-        let name = name_from(json).unwrap();
+        let (show_type, name) = name_from(json).unwrap();
         let year = year_from(json).unwrap();
         let rating = rating_from(json).unwrap();
         let runtime = runtime_from(json).unwrap();
@@ -27,6 +30,7 @@ impl Film {
             rating: rating.to_string(),
             runtime: runtime.to_string(),
             slug: slug.to_string(),
+            show_type: show_type.to_string(),
         })
     }
 
@@ -69,8 +73,22 @@ fn id_from(data: &serde_json::Value) -> Option<&str> {
     data["FilmId"].as_str()
 }
 
-fn name_from(data: &serde_json::Value) -> Option<&str> {
-    data["FilmName"].as_str()
+fn name_from(data: &serde_json::Value) -> Option<(String, String)> {
+    let name = data["FilmName"].as_str()?;
+
+    lazy_static! {
+         static ref RE: Regex = Regex::new(r"^(.*[a-z].*):\s+([A-Z0-9,\-\s()]+)\s*(\([A-Za-z0-9,\-]\))$").unwrap();
+    }
+
+    match RE.captures(name) {
+        None => Some((String::from(""), name.to_string())), // no match, so return nothing.
+        Some(cap) => {
+            let show_type = cap[1].to_string();
+            let name = cap[2].to_string();
+
+            Some((show_type, name))
+        }
+    }
 }
 
 fn year_from(data: &serde_json::Value) -> Option<&str> {
