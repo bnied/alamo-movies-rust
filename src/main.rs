@@ -11,9 +11,9 @@ fn main() {
     let cinema_id = args.get(1).expect("Please supply a cinema_id");
 
     // first, read the file into a string
-    let mut path = String::from("./db/");
-    path.push_str(cinema_id);
-    path.push_str(".calendar.json");
+    let path = Cinema::get_file_path_for(cinema_id);
+
+    println!("Opening file: {}", path);
 
     let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
 

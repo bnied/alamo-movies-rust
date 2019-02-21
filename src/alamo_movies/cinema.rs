@@ -1,6 +1,9 @@
 use std::fs;
 use std::error::Error;
 
+use std::env;
+use std::path::{PathBuf};
+
 use super::market::Market;
 use super::film::Film;
 
@@ -39,6 +42,26 @@ impl Cinema {
         })
     }
 
+    /// Given a cinema ID,
+    /// construct a path to a the json file in the db directory
+    pub fn get_file_path_for(cinema_id: &str) -> String {
+        let home_dir = match env::var("HOME") {
+            Ok(home) => home,
+            _ => String::from(""),
+        };
+
+        // the db directory is ~/.alamo-movies/db 
+        let mut filename = String::from(cinema_id);
+        filename.push_str(".calendar.json");
+
+        let mut db_path = PathBuf::from(home_dir);
+        db_path = db_path
+            .join(".alamo")
+            .join("db")
+            .join(filename);
+
+        String::from(db_path.to_str().unwrap())
+    }
 }
 
 fn cinema_name_from(data: &serde_json::Value) -> Option<&str> {
