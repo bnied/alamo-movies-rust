@@ -7,6 +7,10 @@ extern crate regex;
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
+use std::fs;
+use std::env;
+use std::path::{PathBuf, Path};
+
 fn main() {
     let matches = App::new("Alamo Movies")
         .version("0.1.0")
@@ -16,7 +20,15 @@ fn main() {
                     .about("List films for the given theater")
                     .arg(Arg::with_name("cinema_id")
                          .help("The ID of the cinema from which to list upcoming films.")
-                         .required(true))
+                         .required(true)
+                        )
+                    )
+        .subcommand(SubCommand::with_name("cinema")
+                    .about("List available cinemas.")
+                    .arg(Arg::with_name("cinema_id")
+                         .help("The ID of the cinema to get info about")
+                         .required(false)
+                         )
                     )
         .get_matches();
 
@@ -32,5 +44,64 @@ fn main() {
             println!("{}", movie.name);
         }
     };
+
+    if let Some(matches) = matches.subcommand_matches("cinema") {
+        match matches.value_of("cinema_id") {
+            Some(cinema_id) => 
+                print_cinema_info_for(cinema_id),
+            None =>
+                print_cinema_list(),
+        }
+    }
 }
 
+fn print_cinema_info_for(cinema_id: &str) {
+    let path = Cinema::get_file_path_for(cinema_id);
+
+    print_cinema_info_for_file(&path);
+}
+
+fn print_cinema_info_for_file(path: &str) {
+    let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
+
+    println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
+}
+
+fn print_cinema_list() {
+    let home_dir = match env::var("HOME") {
+        Ok(home) => home,
+        _ => String::from(""),
+    };
+
+    let mut db_path = PathBuf::from(home_dir);
+    db_path = db_path
+        .join(".alamo")
+        .join("db");
+
+    for file in get_cinema_files(db_path) {
+        print_cinema_info_for_file(file.to_str().unwrap());
+    }
+}
+
+fn get_cinema_files(path: PathBuf) -> Vec<PathBuf> {
+    fs::read_dir(path)
+        .unwrap()
+        .filter(|entry| {
+            match entry {
+                Ok(entry) => !entry.path().is_dir() && is_calendar_file(entry.path()),
+                _ => false,
+            }
+        })
+        .map(|entry| {
+            if let Ok(entry) = entry {
+                entry.path()
+            } else {
+                panic!("This shouldn't happen")
+            }
+        })
+        .collect()
+}
+
+fn is_calendar_file(path: PathBuf) -> bool {
+    true
+}
