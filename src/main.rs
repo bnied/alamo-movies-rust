@@ -22,26 +22,15 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("films") {
         let cinema_id = matches.value_of("cinema_id").unwrap();
-        println!("Listing films!");
 
         // first, read the file into a string
         let path = Cinema::get_file_path_for(cinema_id);
-
-        println!("Opening file: {}", path);
-
         let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
 
-        println!("cinema: {} / {} - {}", cinema.name, cinema.id, cinema.slug);
-        println!("market: {} / {} - {}", cinema.market.name, cinema.market.id, cinema.market.slug);
-
-        println!("Movies:");
-
+        // list it out
         for movie in cinema.films.iter() {
-            println!("  - {} ({})", movie.name, movie.rating);
+            println!("{}", movie.name);
         }
     };
-    // let args: Vec<String> = env::args().collect();
-    // let cinema_id = args.get(1).expect("Please supply a cinema_id");
-
 }
 
