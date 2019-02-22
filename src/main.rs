@@ -4,6 +4,8 @@ use crate::alamo_movies::cinema::Cinema;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
+use regex::Regex;
+
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
@@ -103,5 +105,9 @@ fn get_cinema_files(path: PathBuf) -> Vec<PathBuf> {
 }
 
 fn is_calendar_file(path: PathBuf) -> bool {
-    true
+    lazy_static! {
+         static ref RE: Regex = Regex::new(r"\.calendar\.json$").unwrap();
+    }
+
+    RE.is_match(path.to_str().unwrap())
 }
