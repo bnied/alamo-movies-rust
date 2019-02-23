@@ -32,6 +32,13 @@ fn main() {
                          .required(false)
                          )
                     )
+        .subcommand(SubCommand::with_name("get")
+                    .about("Fetch the given cinema")
+                    .arg(Arg::with_name("cinema_id")
+                         .help("The ID of the cinema to fetch")
+                         .required(true)
+                         )
+                    )
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("films") {
@@ -54,6 +61,28 @@ fn main() {
             None =>
                 print_cinema_list(),
         }
+    }
+
+    if let Some(matches) = matches.subcommand_matches("get") {
+        let cinema_id = matches.value_of("cinema_id").unwrap();
+
+        if let Ok(_) = Cinema::sync_file(cinema_id) {
+            let path = Cinema::get_file_path_for(cinema_id);
+            let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
+
+            println!("Synced {} {}", cinema.id, cinema.name);
+        } else {
+            panic!("Error");
+        }
+        // match Cinema::sync_file(cinema_id) {
+            // Ok(_) => {
+                // let path = Cinema::get_file_path_for(cinema_id);
+                // let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
+
+                // println!("Synced {} {}", cinema.id, cinema.name);
+            // },
+            // Err(err) => panic!(err),
+        // }
     }
 }
 

@@ -1,8 +1,11 @@
 use std::fs;
+use std::io::prelude::*;
 use std::error::Error;
 
 use std::env;
 use std::path::{PathBuf};
+
+use reqwest;
 
 use super::market::Market;
 use super::film::Film;
@@ -61,6 +64,32 @@ impl Cinema {
             .join(filename);
 
         String::from(db_path.to_str().unwrap())
+    }
+
+    pub fn write_file(cinema_id: &str, data: &str) -> Result<(), Box<std::io::Error>> {
+        let filepath = Cinema::get_file_path_for(cinema_id);
+        let mut file = fs::File::create(filepath)?;
+
+        let result = file.write_all(data.as_bytes())?;
+
+        Ok(result)
+    }
+
+    pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<Error>>  {
+        let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id); 
+
+        let body = reqwest::get(url)?
+            .text()?;
+
+        Ok(body)
+    }
+
+    pub fn sync_file(cinema_id: &str) -> Result<(), Box<dyn Error>> {
+        let body = Cinema::get_calendar_data(cinema_id)?;
+
+        let result = Cinema::write_file(cinema_id, &body)?;
+
+        Ok(result)
     }
 }
 
