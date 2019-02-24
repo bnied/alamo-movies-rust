@@ -47,7 +47,7 @@ impl Cinema {
 
     /// Given a cinema ID,
     /// construct a path to a the json file in the db directory
-    pub fn get_file_path_for(cinema_id: &str) -> String {
+    pub fn get_file_path_for(cinema_id: &str) -> PathBuf {
         let home_dir = match env::var("HOME") {
             Ok(home) => home,
             _ => String::from(""),
@@ -63,7 +63,7 @@ impl Cinema {
             .join("db")
             .join(filename);
 
-        String::from(db_path.to_str().unwrap())
+        db_path
     }
 
     pub fn write_file(cinema_id: &str, data: &str) -> Result<(), Box<std::io::Error>> {

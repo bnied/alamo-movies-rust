@@ -11,7 +11,7 @@ use clap::{Arg, App, SubCommand};
 
 use std::fs;
 use std::env;
-use std::path::{PathBuf, Path};
+use std::path::{PathBuf};
 
 fn main() {
     let matches = App::new("Alamo Movies")
@@ -64,7 +64,7 @@ fn main() {
 
         if let Ok(_) = Cinema::sync_file(cinema_id) {
             let path = Cinema::get_file_path_for(cinema_id);
-            let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
+            let cinema = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
             println!("Synced {} {}", cinema.id, cinema.name);
         } else {
@@ -76,11 +76,11 @@ fn main() {
 fn print_cinema_info_for(cinema_id: &str) {
     let path = Cinema::get_file_path_for(cinema_id);
 
-    print_cinema_info_for_file(&path);
+    print_cinema_info_for_file(path.to_str().unwrap());
 }
 
 fn print_cinema_info_for_file(path: &str) {
-    let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
+    let cinema = Cinema::from_calendar_file(path).expect("cannot load file");
 
     println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
 }
