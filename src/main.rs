@@ -44,14 +44,7 @@ fn main() {
     if let Some(matches) = matches.subcommand_matches("films") {
         let cinema_id = matches.value_of("cinema_id").unwrap();
 
-        // first, read the file into a string
-        let path = Cinema::get_file_path_for(cinema_id);
-        let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
-
-        // list it out
-        for movie in cinema.films.iter() {
-            println!("{}", movie.name);
-        }
+        list_films_for(cinema_id);
     } else if let Some(matches) = matches.subcommand_matches("cinema") {
         match matches.value_of("cinema_id") {
             Some(cinema_id) => 
@@ -70,6 +63,26 @@ fn main() {
         } else {
             panic!("Error");
         }
+    }
+}
+
+fn list_films_for(cinema_id: &str) {
+    // first, read the file into a string
+    let path = Cinema::get_file_path_for(cinema_id);
+
+    // if the file does not exist, then download it.
+    if ! path.is_file() {
+        match Cinema::sync_file(cinema_id) {
+            Err(_) => panic!("Failed to get cinema file for id: {}", cinema_id),
+            _ => eprintln!("Fetched new file for id: {}", cinema_id),
+        }
+    }
+
+    let cinema = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
+
+    // list it out
+    for movie in cinema.films.iter() {
+        println!("{}", movie.name);
     }
 }
 
