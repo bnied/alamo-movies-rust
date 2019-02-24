@@ -52,18 +52,14 @@ fn main() {
         for movie in cinema.films.iter() {
             println!("{}", movie.name);
         }
-    };
-
-    if let Some(matches) = matches.subcommand_matches("cinema") {
+    } else if let Some(matches) = matches.subcommand_matches("cinema") {
         match matches.value_of("cinema_id") {
             Some(cinema_id) => 
                 print_cinema_info_for(cinema_id),
             None =>
                 print_cinema_list(),
         }
-    }
-
-    if let Some(matches) = matches.subcommand_matches("get") {
+    } else if let Some(matches) = matches.subcommand_matches("get") {
         let cinema_id = matches.value_of("cinema_id").unwrap();
 
         if let Ok(_) = Cinema::sync_file(cinema_id) {
@@ -74,15 +70,6 @@ fn main() {
         } else {
             panic!("Error");
         }
-        // match Cinema::sync_file(cinema_id) {
-            // Ok(_) => {
-                // let path = Cinema::get_file_path_for(cinema_id);
-                // let cinema = Cinema::from_calendar_file(&path).expect("cannot load file");
-
-                // println!("Synced {} {}", cinema.id, cinema.name);
-            // },
-            // Err(err) => panic!(err),
-        // }
     }
 }
 
