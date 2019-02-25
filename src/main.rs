@@ -27,6 +27,13 @@ fn main() {
                     )
         .subcommand(SubCommand::with_name("cinema")
                     .about("List available cinemas.")
+                    .arg(Arg::with_name("local")
+                         .help("Only print from local data")
+                         .required(false)
+                         .short("l")
+                         .long("local")
+                         .takes_value(false)
+                         )
                     .arg(Arg::with_name("cinema_id")
                          .help("The ID of the cinema to get info about")
                          .required(false)
@@ -50,7 +57,7 @@ fn main() {
             Some(cinema_id) => 
                 print_cinema_info_for(cinema_id),
             None =>
-                print_cinema_list(),
+                print_cinema_list(matches),
         }
     } else if let Some(matches) = matches.subcommand_matches("get") {
         let cinema_id = matches.value_of("cinema_id").unwrap();
@@ -98,19 +105,31 @@ fn print_cinema_info_for_file(path: &str) {
     println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
 }
 
-fn print_cinema_list() {
-    let home_dir = match env::var("HOME") {
-        Ok(home) => home,
-        _ => String::from(""),
-    };
+fn print_cinema_list(matches: &clap::ArgMatches) {
 
-    let mut db_path = PathBuf::from(home_dir);
-    db_path = db_path
-        .join(".alamo")
-        .join("db");
+    let local_only: bool = matches.occurrences_of("local") > 0;
 
-    for file in get_cinema_files(db_path) {
-        print_cinema_info_for_file(file.to_str().unwrap());
+    if local_only {
+        let home_dir = match env::var("HOME") {
+            Ok(home) => home,
+            _ => String::from(""),
+        };
+
+        let mut db_path = PathBuf::from(home_dir);
+        db_path = db_path
+            .join(".alamo")
+            .join("db");
+
+        for file in get_cinema_files(db_path) {
+            print_cinema_info_for_file(file.to_str().unwrap());
+        }
+    } else {
+        // print out the built-in cinema list
+        let cinemas = Cinema::list();
+
+        for cinema in cinemas {
+            println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
+        }
     }
 }
 
