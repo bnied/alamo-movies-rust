@@ -64,7 +64,7 @@ fn main() {
 
         if let Ok(_) = Cinema::sync_file(cinema_id) {
             let path = Cinema::get_file_path_for(cinema_id);
-            let cinema = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
+            let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
             println!("Synced {} {}", cinema.id, cinema.name);
         } else {
@@ -85,10 +85,10 @@ fn list_films_for(cinema_id: &str) {
         }
     }
 
-    let cinema = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
+    let (cinema, films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
     // list it out
-    for movie in cinema.films.iter() {
+    for movie in films.iter() {
         println!("{}", movie.name);
     }
 }
@@ -100,7 +100,7 @@ fn print_cinema_info_for(cinema_id: &str) {
 }
 
 fn print_cinema_info_for_file(path: &str) {
-    let cinema = Cinema::from_calendar_file(path).expect("cannot load file");
+    let (cinema, _films) = Cinema::from_calendar_file(path).expect("cannot load file");
 
     println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
 }
@@ -127,7 +127,7 @@ fn print_cinema_list(matches: &clap::ArgMatches) {
         // print out the built-in cinema list
         let cinemas = Cinema::list();
 
-        for cinema in cinemas {
+        for cinema in cinemas.iter() {
             println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
         }
     }

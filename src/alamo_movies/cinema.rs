@@ -15,12 +15,11 @@ pub struct Cinema {
     pub name: String,
     pub slug: String,
     pub market: Market,
-    pub films: Vec<Film>,
 }
 
 impl Cinema {
-    pub fn list() -> Vec<Cinema> {
-       vec![
+    pub fn list() -> [Cinema; 32] {
+       [
             Cinema {
                 id: String::from("0002"),
                 name: String::from("Ritz"),
@@ -30,7 +29,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0003"),
@@ -41,7 +39,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0004"),
@@ -52,7 +49,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0006"),
@@ -63,7 +59,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0007"),
@@ -74,7 +69,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0008"),
@@ -85,7 +79,6 @@ impl Cinema {
                     name: String::from("Austin, TX"),
                     slug: String::from("austin"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0106"),
@@ -96,7 +89,6 @@ impl Cinema {
                     name: String::from("Houston, TX"),
                     slug: String::from("houston"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0201"),
@@ -107,7 +99,6 @@ impl Cinema {
                     name: String::from("San Antonio, TX"),
                     slug: String::from("san-antonio"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0202"),
@@ -118,7 +109,6 @@ impl Cinema {
                     name: String::from("San Antonio, TX"),
                     slug: String::from("san-antonio"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0203"),
@@ -129,7 +119,6 @@ impl Cinema {
                     name: String::from("San Antonio, TX"),
                     slug: String::from("san-antonio"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0301"),
@@ -140,7 +129,6 @@ impl Cinema {
                     name: String::from("Winchester, VA"),
                     slug: String::from("winchester"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0401"),
@@ -151,7 +139,6 @@ impl Cinema {
                     name: String::from("Denver, CO"),
                     slug: String::from("denver"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0402"),
@@ -162,7 +149,6 @@ impl Cinema {
                     name: String::from("Denver, CO"),
                     slug: String::from("denver"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0501"),
@@ -173,7 +159,6 @@ impl Cinema {
                     name: String::from("Northern Virginia"),
                     slug: String::from("northern-virginia"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0502"),
@@ -184,7 +169,6 @@ impl Cinema {
                     name: String::from("Northern Virginia"),
                     slug: String::from("northern-virginia"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0601"),
@@ -195,7 +179,6 @@ impl Cinema {
                     name: String::from("Kansas City, MO"),
                     slug: String::from("kansas-city"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0701"),
@@ -206,7 +189,6 @@ impl Cinema {
                     name: String::from("DFW Area, TX"),
                     slug: String::from("dfw"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0702"),
@@ -217,7 +199,6 @@ impl Cinema {
                     name: String::from("DFW Area, TX"),
                     slug: String::from("dfw"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0703"),
@@ -228,7 +209,6 @@ impl Cinema {
                     name: String::from("DFW Area, TX"),
                     slug: String::from("dfw"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0706"),
@@ -239,7 +219,6 @@ impl Cinema {
                     name: String::from("DFW Area, TX"),
                     slug: String::from("dfw"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0707"),
@@ -250,7 +229,6 @@ impl Cinema {
                     name: String::from("DFW Area, TX"),
                     slug: String::from("dfw"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0801"),
@@ -261,7 +239,6 @@ impl Cinema {
                     name: String::from("San Francisco, CA"),
                     slug: String::from("sf"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("0901"),
@@ -272,7 +249,6 @@ impl Cinema {
                     name: String::from("Greater NY"),
                     slug: String::from("yonkers"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1201"),
@@ -283,7 +259,6 @@ impl Cinema {
                     name: String::from("El Paso, TX"),
                     slug: String::from("el-paso"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1301"),
@@ -294,7 +269,6 @@ impl Cinema {
                     name: String::from("New Braunfels, TX"),
                     slug: String::from("new-braunfels"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1401"),
@@ -305,7 +279,6 @@ impl Cinema {
                     name: String::from("Lubbock, TX"),
                     slug: String::from("lubbock"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1501"),
@@ -316,7 +289,6 @@ impl Cinema {
                     name: String::from("Laredo, TX"),
                     slug: String::from("laredo"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1601"),
@@ -327,7 +299,6 @@ impl Cinema {
                     name: String::from("Omaha, NE"),
                     slug: String::from("omaha"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1901"),
@@ -338,7 +309,6 @@ impl Cinema {
                     name: String::from("Phoenix, AZ"),
                     slug: String::from("phoenix"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("1902"),
@@ -349,7 +319,6 @@ impl Cinema {
                     name: String::from("Phoenix, AZ"),
                     slug: String::from("phoenix"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("2001"),
@@ -360,7 +329,6 @@ impl Cinema {
                     name: String::from("Corpus Christi, TX"),
                     slug: String::from("corpus-christi"),
                 },
-                films: vec![],
             },
             Cinema {
                 id: String::from("2101"),
@@ -371,14 +339,11 @@ impl Cinema {
                     name: String::from("Brooklyn"),
                     slug: String::from("nyc"),
                 },
-                films: vec![],
             },
-
-       
        ] 
     }
 
-    pub fn from_calendar_file(path: &str) -> Result<Cinema, Box<dyn Error>> {
+    pub fn from_calendar_file(path: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let contents = fs::read_to_string(path)?;
 
         let v: serde_json::Value = serde_json::from_str(&contents)?;
@@ -388,20 +353,20 @@ impl Cinema {
         Cinema::from_calendar_json(data)
     }
 
-    pub fn from_calendar_json(json: &serde_json::Value) -> Result<Cinema, Box<dyn Error>> {
+    pub fn from_calendar_json(json: &serde_json::Value) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let name = cinema_name_from(json).unwrap();
         let id = cinema_id_from(json).unwrap();
         let slug = cinema_slug_from(json).unwrap();
 
         let market = Market::from_calendar_json(json)?;
 
-        Ok(Cinema {
+        Ok((Cinema {
             id: id.to_string(),
             name: name.to_string(),
             slug: slug.to_string(),
             market,
-            films: Film::films_from_calendar(json)?,
-        })
+        }, Film::films_from_calendar(json)?,
+        ))
     }
 
     /// Given a cinema ID,
