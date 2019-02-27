@@ -63,7 +63,7 @@ fn print_cinema_info_for_file(path: &str) {
     println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
 }
 
-fn print_cinema_list(matches: &clap::ArgMatches) {
+fn print_cinema_list(matches: &ArgMatches) {
 
     let local_only: bool = matches.occurrences_of("local") > 0;
 
