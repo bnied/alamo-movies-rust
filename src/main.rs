@@ -9,9 +9,6 @@ extern crate regex;
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
-use std::env;
-use std::path::{PathBuf};
-
 fn main() {
     let matches = App::new("Alamo Movies")
         .version("0.1.0")
@@ -84,7 +81,7 @@ fn list_films_for(cinema_id: &str) {
         }
     }
 
-    let (cinema, films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
+    let (_cinema, films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
     // list it out
     for movie in films.iter() {
@@ -109,15 +106,7 @@ fn print_cinema_list(matches: &clap::ArgMatches) {
     let local_only: bool = matches.occurrences_of("local") > 0;
 
     if local_only {
-        let home_dir = match env::var("HOME") {
-            Ok(home) => home,
-            _ => String::from(""),
-        };
-
-        let mut db_path = PathBuf::from(home_dir);
-        db_path = db_path
-            .join(".alamo")
-            .join("db");
+        let db_path = db::base_directory();
 
         for file in db::list_cinema_files(db_path) {
             print_cinema_info_for_file(file.to_str().unwrap());

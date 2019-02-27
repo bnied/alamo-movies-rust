@@ -5,6 +5,17 @@ use std::io::prelude::*;
 
 use regex::Regex;
 
+pub fn base_directory() -> PathBuf {
+    let home_dir = match env::var("HOME") {
+        Ok(home) => home,
+        _ => String::from(""),
+    };
+
+    PathBuf::from(home_dir)
+        .join(".alamo")
+        .join("db")
+}
+
 /// returns a list of all cinema files from the given path
 pub fn list_cinema_files(path: PathBuf) -> Vec<PathBuf> {
     fs::read_dir(path)
@@ -38,22 +49,11 @@ fn is_calendar_file(path: PathBuf) -> bool {
 /// Given a cinema ID,
 /// construct a path to a the json file in the db directory
 pub fn calendar_path_for_cinema(cinema_id: &str) -> PathBuf {
-    let home_dir = match env::var("HOME") {
-        Ok(home) => home,
-        _ => String::from(""),
-    };
-
     // the db directory is ~/.alamo-movies/db 
     let mut filename = String::from(cinema_id);
     filename.push_str(".calendar.json");
 
-    let mut db_path = PathBuf::from(home_dir);
-    db_path = db_path
-        .join(".alamo")
-        .join("db")
-        .join(filename);
-
-    db_path
+    base_directory().join(filename)
 }
 
 /// given the ID of the cinema and string data (from the web API)
