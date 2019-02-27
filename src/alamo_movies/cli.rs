@@ -11,9 +11,15 @@ pub fn subcommand_films(matches: &ArgMatches) {
 
 pub fn subcommand_cinema(matches: &ArgMatches) {
     match matches.value_of("cinema_id") {
-        Some(cinema_id) => 
-            print_cinema_info_for(cinema_id),
+        Some(cinema_id) => { 
+            // the user passed a cinema ID
+            // so find that cinema and print it.
+            let file_path = db::calendar_path_for_cinema(cinema_id);
+            print_cinema_info_for_file(file_path.to_str().unwrap());
+        },
         None =>
+            // the user did not pass a cinema ID
+            // so print a list of all cinemas (with other args we got)
             print_cinema_list(matches),
     }
 }
@@ -49,12 +55,6 @@ fn list_films_for(cinema_id: &str) {
     for movie in films.iter() {
         println!("{}", movie.name);
     }
-}
-
-fn print_cinema_info_for(cinema_id: &str) {
-    let path = db::calendar_path_for_cinema(cinema_id);
-
-    print_cinema_info_for_file(path.to_str().unwrap());
 }
 
 fn print_cinema_info_for_file(path: &str) {
