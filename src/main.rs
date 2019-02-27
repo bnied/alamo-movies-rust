@@ -63,7 +63,7 @@ fn main() {
         let cinema_id = matches.value_of("cinema_id").unwrap();
 
         if let Ok(_) = Cinema::sync_file(cinema_id) {
-            let path = Cinema::get_file_path_for(cinema_id);
+            let path = Cinema::db_file_path_for(cinema_id);
             let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
             println!("Synced {} {}", cinema.id, cinema.name);
@@ -75,7 +75,7 @@ fn main() {
 
 fn list_films_for(cinema_id: &str) {
     // first, read the file into a string
-    let path = Cinema::get_file_path_for(cinema_id);
+    let path = Cinema::db_file_path_for(cinema_id);
 
     // if the file does not exist, then download it.
     if ! path.is_file() {
@@ -94,7 +94,7 @@ fn list_films_for(cinema_id: &str) {
 }
 
 fn print_cinema_info_for(cinema_id: &str) {
-    let path = Cinema::get_file_path_for(cinema_id);
+    let path = Cinema::db_file_path_for(cinema_id);
 
     print_cinema_info_for_file(path.to_str().unwrap());
 }

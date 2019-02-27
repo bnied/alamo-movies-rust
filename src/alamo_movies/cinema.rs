@@ -365,13 +365,18 @@ impl Cinema {
             name: name.to_string(),
             slug: slug.to_string(),
             market,
-        }, Film::films_from_calendar(json)?,
+            },
+            Film::films_from_calendar(json)?,
         ))
+    }
+
+    pub fn db_file_path(&self) -> PathBuf {
+        Cinema::db_file_path_for(&self.id)
     }
 
     /// Given a cinema ID,
     /// construct a path to a the json file in the db directory
-    pub fn get_file_path_for(cinema_id: &str) -> PathBuf {
+    pub fn db_file_path_for(cinema_id: &str) -> PathBuf {
         let home_dir = match env::var("HOME") {
             Ok(home) => home,
             _ => String::from(""),
@@ -391,7 +396,7 @@ impl Cinema {
     }
 
     pub fn write_file(cinema_id: &str, data: &str) -> Result<(), Box<std::io::Error>> {
-        let filepath = Cinema::get_file_path_for(cinema_id);
+        let filepath = Cinema::db_file_path_for(cinema_id);
         let mut file = fs::File::create(filepath)?;
 
         let result = file.write_all(data.as_bytes())?;
