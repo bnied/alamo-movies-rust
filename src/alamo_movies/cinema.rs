@@ -1,14 +1,11 @@
 use std::fs;
-use std::io::prelude::*;
 use std::error::Error;
-
-use std::env;
-use std::path::{PathBuf};
 
 use reqwest;
 
 use super::market::Market;
 use super::film::Film;
+use super::db;
 
 pub struct Cinema {
     pub id: String,
@@ -370,40 +367,6 @@ impl Cinema {
         ))
     }
 
-    pub fn db_file_path(&self) -> PathBuf {
-        Cinema::db_file_path_for(&self.id)
-    }
-
-    /// Given a cinema ID,
-    /// construct a path to a the json file in the db directory
-    pub fn db_file_path_for(cinema_id: &str) -> PathBuf {
-        let home_dir = match env::var("HOME") {
-            Ok(home) => home,
-            _ => String::from(""),
-        };
-
-        // the db directory is ~/.alamo-movies/db 
-        let mut filename = String::from(cinema_id);
-        filename.push_str(".calendar.json");
-
-        let mut db_path = PathBuf::from(home_dir);
-        db_path = db_path
-            .join(".alamo")
-            .join("db")
-            .join(filename);
-
-        db_path
-    }
-
-    pub fn write_file(cinema_id: &str, data: &str) -> Result<(), Box<std::io::Error>> {
-        let filepath = Cinema::db_file_path_for(cinema_id);
-        let mut file = fs::File::create(filepath)?;
-
-        let result = file.write_all(data.as_bytes())?;
-
-        Ok(result)
-    }
-
     pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<Error>>  {
         let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id); 
 
@@ -416,7 +379,7 @@ impl Cinema {
     pub fn sync_file(cinema_id: &str) -> Result<(), Box<dyn Error>> {
         let body = Cinema::get_calendar_data(cinema_id)?;
 
-        let result = Cinema::write_file(cinema_id, &body)?;
+        let result = db::write_calendar_file(cinema_id, &body)?;
 
         Ok(result)
     }

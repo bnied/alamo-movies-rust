@@ -1,15 +1,14 @@
 mod alamo_movies;
 use crate::alamo_movies::cinema::Cinema;
+use crate::alamo_movies::db;
 
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
-use regex::Regex;
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
-use std::fs;
 use std::env;
 use std::path::{PathBuf};
 
@@ -63,7 +62,7 @@ fn main() {
         let cinema_id = matches.value_of("cinema_id").unwrap();
 
         if let Ok(_) = Cinema::sync_file(cinema_id) {
-            let path = Cinema::db_file_path_for(cinema_id);
+            let path = db::calendar_path_for_cinema(cinema_id);
             let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
             println!("Synced {} {}", cinema.id, cinema.name);
@@ -75,7 +74,7 @@ fn main() {
 
 fn list_films_for(cinema_id: &str) {
     // first, read the file into a string
-    let path = Cinema::db_file_path_for(cinema_id);
+    let path = db::calendar_path_for_cinema(cinema_id);
 
     // if the file does not exist, then download it.
     if ! path.is_file() {
@@ -94,7 +93,7 @@ fn list_films_for(cinema_id: &str) {
 }
 
 fn print_cinema_info_for(cinema_id: &str) {
-    let path = Cinema::db_file_path_for(cinema_id);
+    let path = db::calendar_path_for_cinema(cinema_id);
 
     print_cinema_info_for_file(path.to_str().unwrap());
 }
@@ -120,7 +119,7 @@ fn print_cinema_list(matches: &clap::ArgMatches) {
             .join(".alamo")
             .join("db");
 
-        for file in get_cinema_files(db_path) {
+        for file in db::list_cinema_files(db_path) {
             print_cinema_info_for_file(file.to_str().unwrap());
         }
     } else {
@@ -133,29 +132,4 @@ fn print_cinema_list(matches: &clap::ArgMatches) {
     }
 }
 
-fn get_cinema_files(path: PathBuf) -> Vec<PathBuf> {
-    fs::read_dir(path)
-        .unwrap()
-        .filter(|entry| {
-            match entry {
-                Ok(entry) => !entry.path().is_dir() && is_calendar_file(entry.path()),
-                _ => false,
-            }
-        })
-        .map(|entry| {
-            if let Ok(entry) = entry {
-                entry.path()
-            } else {
-                panic!("This shouldn't happen")
-            }
-        })
-        .collect()
-}
 
-fn is_calendar_file(path: PathBuf) -> bool {
-    lazy_static! {
-         static ref RE: Regex = Regex::new(r"\.calendar\.json$").unwrap();
-    }
-
-    RE.is_match(path.to_str().unwrap())
-}
