@@ -29,7 +29,7 @@ pub fn subcommand_get(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
 
     if let Ok(_) = Cinema::sync_file(cinema_id) {
-        let path = db::calendar_path_for_cinema(cinema_id);
+        let path = db::calendar_path_for_cinema_id(cinema_id);
         let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
         println!("Synced {} {}", cinema.id, cinema.name);
@@ -39,7 +39,7 @@ pub fn subcommand_get(matches: &ArgMatches) {
 }
 
 fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
-    let path = db::calendar_path_for_cinema(cinema_id);
+    let path = db::calendar_path_for_cinema_id(cinema_id);
 
     // if the file does not exist, then download it.
     if ! path.is_file() {
