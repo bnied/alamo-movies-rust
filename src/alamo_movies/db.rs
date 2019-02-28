@@ -36,6 +36,24 @@ pub fn list_cinema_files(path: PathBuf) -> Vec<PathBuf> {
         .collect()
 }
 
+pub fn list_cinema_ids(path: PathBuf) -> Vec<String> {
+    lazy_static! {
+         static ref RE: Regex = Regex::new(r"^(\d+)\.").unwrap();
+    }
+
+    list_cinema_files(path)
+        .iter()
+        .map(|path| {
+            let filename = path.file_name().unwrap().to_str().unwrap();
+
+            match RE.captures(filename) {
+                Some(cap) => cap[1].to_string(),
+                None => panic!("Filename not parsable. FAIL."),
+            }
+        })
+        .collect()
+}
+
 /// private function that, given a path
 /// returns whether it's a calendar file by inspecting the filename
 fn is_calendar_file(path: PathBuf) -> bool {

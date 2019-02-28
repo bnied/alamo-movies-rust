@@ -15,8 +15,7 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
         Some(cinema_id) => { 
             // the user passed a cinema ID
             // so find that cinema and print it.
-            let file_path = db::calendar_path_for_cinema(cinema_id);
-            print_cinema_info_for_file(file_path.to_str().unwrap());
+            print_cinema_info(cinema_id);
         },
         None =>
             // the user did not pass a cinema ID
@@ -67,8 +66,8 @@ fn list_films_for(cinema_id: &str) {
     }
 }
 
-fn print_cinema_info_for_file(path: &str) {
-    let (cinema, _films) = Cinema::from_calendar_file(path).expect("cannot load file");
+fn print_cinema_info(cinema_id: &str) {
+    let (cinema, _films) = load_or_sync_cinema_for_id(cinema_id).expect("Failed to load cinema file.");
 
     println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
 }
@@ -80,8 +79,8 @@ fn print_cinema_list(matches: &ArgMatches) {
     if local_only {
         let db_path = db::base_directory();
 
-        for file in db::list_cinema_files(db_path) {
-            print_cinema_info_for_file(file.to_str().unwrap());
+        for cinema_id in db::list_cinema_ids(db_path) {
+            print_cinema_info(&cinema_id);
         }
     } else {
         // print out the built-in cinema list
