@@ -68,7 +68,12 @@ fn list_films_for(cinema_id: &str) {
 }
 
 fn print_cinema_info(cinema: &Cinema) {
-    println!("{} {} ({})", cinema.id, cinema.name, cinema.market.name);
+    println!("{cinema_id} [{cinema_slug}] {cinema_name} ({market})",
+        cinema_id = cinema.id,
+        cinema_slug = cinema.slug,
+        cinema_name = cinema.name,
+        market = cinema.market.name,
+    );
 }
 
 fn print_cinema_list(matches: &ArgMatches) {
