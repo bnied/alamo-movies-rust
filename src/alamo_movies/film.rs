@@ -1,5 +1,4 @@
 use std::error::Error;
-use serde_json::Value;
 use std::collections::HashSet;
 
 use regex::Regex;
@@ -32,10 +31,6 @@ impl Film {
             slug: slug.to_string(),
             show_type: show_type.to_string(),
         })
-    }
-
-    fn get_array<'a>(json: &'a Value, key: &str) -> Option<&'a Vec<Value>> {
-        json[key].as_array()
     }
 
     pub fn films_from_calendar(json: &serde_json::Value) -> Result<Vec<Film>, Box<dyn Error>> {
