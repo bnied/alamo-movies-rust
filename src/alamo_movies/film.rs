@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::collections::HashSet;
 
-use regex::Regex;
+use super::film_title::FilmTitle;
 
 pub struct Film {
     pub id: String,
@@ -10,13 +10,14 @@ pub struct Film {
     pub rating: String,
     pub runtime: String,
     pub slug: String,
-    pub show_type: String, // Things like Terror Tuesday or Movie Party
+    pub show_type: String, // Things like "Terror Tuesday" or "Movie Party"
+    pub suffix: String, // like "in 35mm"
 }
 
 impl Film {
     pub fn from_json(json: &serde_json::Value) -> Result<Film, Box<dyn Error>> {
         let id = id_from(json).unwrap();
-        let (show_type, name) = name_from(json).unwrap();
+        let film_title = name_from(json).unwrap();
         let year = year_from(json).unwrap();
         let rating = rating_from(json).unwrap();
         let runtime = runtime_from(json).unwrap();
@@ -24,12 +25,13 @@ impl Film {
 
         Ok(Film {
             id: id.to_string(),
-            name: name.to_string(),
+            name: film_title.title.to_string(),
             year: year.to_string(),
             rating: rating.to_string(),
             runtime: runtime.to_string(),
             slug: slug.to_string(),
-            show_type: show_type.to_string(),
+            show_type: film_title.show_type.to_string(),
+            suffix: film_title.suffix.to_string(),
         })
     }
 
@@ -64,26 +66,14 @@ impl Film {
 }
 
 
+
 fn id_from(data: &serde_json::Value) -> Option<&str> {
     data["FilmId"].as_str()
 }
 
-fn name_from(data: &serde_json::Value) -> Option<(String, String)> {
+fn name_from(data: &serde_json::Value) -> Option<FilmTitle> {
     let name = data["FilmName"].as_str()?;
-
-    lazy_static! {
-         static ref RE: Regex = Regex::new(r"^(.*[a-z].*):\s+([A-Z0-9,\-\s()]+)\s*(\([A-Za-z0-9,\-]\))$").unwrap();
-    }
-
-    match RE.captures(name) {
-        None => Some((String::from(""), name.to_string())), // no match, so return nothing.
-        Some(cap) => {
-            let show_type = cap[1].to_string();
-            let name = cap[2].to_string();
-
-            Some((show_type, name))
-        }
-    }
+    FilmTitle::parse(name)
 }
 
 fn year_from(data: &serde_json::Value) -> Option<&str> {
