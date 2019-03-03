@@ -6,6 +6,7 @@ use reqwest;
 use super::market::Market;
 use super::film::Film;
 use super::db;
+use super::error::{InvalidCinemaFile};
 
 pub struct Cinema {
     pub id: String,
@@ -345,9 +346,13 @@ impl Cinema {
 
         let v: serde_json::Value = serde_json::from_str(&contents)?;
 
-        let data = &v["Calendar"]["Cinemas"][0];
+        match &v["Calendar"]["Cinemas"][0] {
+            serde_json::Value::Null => {
+                Err(Box::new(InvalidCinemaFile::for_path(path)))
+            }
+            data => Cinema::from_calendar_json(data),
+        }
 
-        Cinema::from_calendar_json(data)
     }
 
     pub fn from_calendar_json(json: &serde_json::Value) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {

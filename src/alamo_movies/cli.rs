@@ -53,7 +53,13 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
         }
     }
 
-    Some(Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file"))
+    match Cinema::from_calendar_file(path.to_str().unwrap()) {
+        Err(error) => {
+            eprintln!("Error: {}", error);
+            std::process::exit(1);
+        },
+        Ok(result) => Some(result),
+    }
 }
 
 fn list_films_for(cinema_id: &str) {
