@@ -11,9 +11,13 @@ pub fn base_directory() -> PathBuf {
         _ => String::from(""),
     };
 
-    PathBuf::from(home_dir)
+    let path = PathBuf::from(home_dir)
         .join(".alamo")
-        .join("db")
+        .join("db");
+
+    fs::create_dir_all(&path);
+
+    path
 }
 
 /// returns a list of all cinema files from the given path
