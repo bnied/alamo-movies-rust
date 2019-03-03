@@ -2,6 +2,8 @@ use super::cinema::Cinema;
 use super::film::Film;
 use super::db;
 
+use std::process::exit;
+
 use clap::{ArgMatches};
 
 pub fn subcommand_films(matches: &ArgMatches) {
@@ -48,7 +50,11 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
     // if the file does not exist, then download it.
     if ! path.is_file() {
         match Cinema::sync_file(cinema_id) {
-            Err(_) => return None,
+            Err(error) => {
+                eprintln!("Failed to download cinema data for cinema with ID {}: {}", cinema_id, error);
+                eprintln!("Is this a valid cinema ID?");
+                exit(1);
+            },
             _ => eprintln!("Synced file for cinema via API."),
         }
     }
@@ -56,7 +62,7 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
     match Cinema::from_calendar_file(path.to_str().unwrap()) {
         Err(error) => {
             eprintln!("Error: {}", error);
-            std::process::exit(1);
+            exit(1);
         },
         Ok(result) => Some(result),
     }
@@ -72,7 +78,7 @@ fn list_films_for(cinema_id: &str) {
         },
         None => {
             eprintln!("Failed to load cinema file.");
-            std::process::exit(1);
+            exit(1);
         }
     }
 }
@@ -89,7 +95,7 @@ fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
         },
         None => {
             eprintln!("Failed to load cinema file.");
-            std::process::exit(1);
+            exit(1);
         }
     }
 }

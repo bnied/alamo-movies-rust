@@ -31,3 +31,24 @@ impl error::Error for InvalidCinemaFile {
         None
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct InvalidCinemaData;
+
+impl fmt::Display for InvalidCinemaData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Invalid cinema data.")
+    } 
+
+}
+
+impl error::Error for InvalidCinemaData {
+    fn description(&self) -> &str {
+        "data does not represent a valid cinema and films"
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        // Generic error, underlying cause isn't tracked.
+        None
+    }
+}

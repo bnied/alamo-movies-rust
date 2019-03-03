@@ -6,7 +6,7 @@ use reqwest;
 use super::market::Market;
 use super::film::Film;
 use super::db;
-use super::error::{InvalidCinemaFile};
+use super::error::{InvalidCinemaData};
 
 pub struct Cinema {
     pub id: String,
@@ -343,12 +343,15 @@ impl Cinema {
 
     pub fn from_calendar_file(path: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let contents = fs::read_to_string(path)?;
+        Cinema::from_calendar_data(&contents)
+    }
 
-        let v: serde_json::Value = serde_json::from_str(&contents)?;
+    pub fn from_calendar_data(data: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
+        let v: serde_json::Value = serde_json::from_str(data)?;
 
         match &v["Calendar"]["Cinemas"][0] {
             serde_json::Value::Null => {
-                Err(Box::new(InvalidCinemaFile::for_path(path)))
+                Err(Box::new(InvalidCinemaData))
             }
             data => Cinema::from_calendar_json(data),
         }
@@ -383,6 +386,9 @@ impl Cinema {
 
     pub fn sync_file(cinema_id: &str) -> Result<(), Box<dyn Error>> {
         let body = Cinema::get_calendar_data(cinema_id)?;
+
+        // validate:
+        Cinema::from_calendar_data(&body)?;
 
         let result = db::write_calendar_file(cinema_id, &body)?;
 
