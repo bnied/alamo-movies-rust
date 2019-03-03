@@ -7,7 +7,11 @@ use clap::{ArgMatches};
 pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
 
-    list_films_for(cinema_id);
+    if let Some(film_type) = matches.value_of("type") {
+        list_filtered_films_for(cinema_id, film_type);    
+    } else {
+        list_films_for(cinema_id);
+    }
 }
 
 pub fn subcommand_cinema(matches: &ArgMatches) {
@@ -58,6 +62,23 @@ fn list_films_for(cinema_id: &str) {
             // list it out
             for film in films.iter() {
                 println!("{}", film.name);
+            }
+        },
+        None => {
+            eprintln!("Failed to load cinema file.");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
+    match load_or_sync_cinema_for_id(cinema_id) {
+        Some((_cinema, films)) => {
+            // list it out
+            for film in films.iter() {
+                if film.show_type.to_lowercase() == film_type.to_lowercase() {
+                    println!("{}", film.name);
+                } 
             }
         },
         None => {
