@@ -2,10 +2,11 @@ use std::env;
 use std::path::PathBuf;
 use std::fs;
 use std::io::prelude::*;
+use std::error::Error;
 
 use regex::Regex;
 
-pub fn base_directory() -> PathBuf {
+pub fn base_directory_path() -> PathBuf {
     let home_dir = match env::var("HOME") {
         Ok(home) => home,
         _ => String::from(""),
@@ -15,9 +16,14 @@ pub fn base_directory() -> PathBuf {
         .join(".alamo")
         .join("db");
 
-    fs::create_dir_all(&path);
-
     path
+}
+
+pub fn ensure_base_directory_exists() -> Result<(), Box<dyn Error>> {
+    let path = base_directory_path();
+    fs::create_dir_all(&path)?;
+
+    Ok(())
 }
 
 /// returns a list of all cinema files from the given path
@@ -75,12 +81,13 @@ pub fn calendar_path_for_cinema_id(cinema_id: &str) -> PathBuf {
     let mut filename = String::from(cinema_id);
     filename.push_str(".calendar.json");
 
-    base_directory().join(filename)
+    base_directory_path().join(filename)
 }
 
 /// given the ID of the cinema and string data (from the web API)
 /// write it to the spot
-pub fn write_calendar_file(cinema_id: &str, data: &str) -> Result<(), Box<std::io::Error>> {
+pub fn write_calendar_file(cinema_id: &str, data: &str) -> Result<(), Box<dyn Error>> {
+    ensure_base_directory_exists()?;
     let filepath = calendar_path_for_cinema_id(cinema_id);
     let mut file = fs::File::create(filepath)?;
 

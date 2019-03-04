@@ -145,7 +145,11 @@ fn print_cinema_list(matches: &ArgMatches) {
     let local_only: bool = matches.occurrences_of("local") > 0;
 
     if local_only {
-        let db_path = db::base_directory();
+        let db_path = db::base_directory_path();
+
+        if ! db_path.is_dir() {
+            return;
+        }
 
         for cinema_id in db::list_cinema_ids(db_path) {
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
