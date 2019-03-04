@@ -49,6 +49,15 @@ fn main() {
                          .required(true)
                          )
                     )
+        .subcommand(SubCommand::with_name("get-all")
+                    .about("Update all local cinema data for every cinema")
+                    .alias("sync-all")
+                    .arg(Arg::with_name("update-only")
+                         .help("Only update existing local cinema data")
+                         .long("update-only")
+                         .takes_value(false)
+                         )
+                    )
         .after_help("adc is in no way affiliated with the Alamo Drafthouse Cinemas.\n\
                      I'm just a huge fan.")
         .get_matches();
@@ -59,6 +68,8 @@ fn main() {
         cli::subcommand_cinema(matches);
     } else if let Some(matches) = matches.subcommand_matches("get") {
         cli::subcommand_get(matches);
+    } else if let Some(matches) = matches.subcommand_matches("get-all") {
+        cli::subcommand_get_all(matches);
     }
 }
 

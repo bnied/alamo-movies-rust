@@ -53,6 +53,36 @@ pub fn subcommand_get(matches: &ArgMatches) {
     }
 }
 
+pub fn subcommand_get_all(matches: &ArgMatches) {
+    if matches.is_present("update-only") {
+        // only update the local files
+        let path = db::base_directory_path();
+        if ! path.is_dir() {
+            eprintln!("No local cinema data to update.");
+            return;
+        }
+
+        let mut error_count = 0;
+
+        for cinema_id in db::list_cinema_ids(path).iter() {
+            error_count = error_count + match Cinema::sync_file(cinema_id) {
+                Err(error) => {
+                    eprintln!("Failed to sync cinema {}: {}", cinema_id, error);
+                    1
+                },
+                Ok((cinema, _films)) => {
+                    eprintln!("Synced cinema {} {}", cinema.id, cinema.name);
+                    0
+                },
+            }
+        }
+    } else {
+        // fetch everything
+        println!("not implemented");
+        exit(1);
+    } 
+}
+
 fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
     let path = db::calendar_path_for_cinema_id(cinema_id);
 
