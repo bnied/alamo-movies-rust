@@ -2,6 +2,7 @@ use std::fs;
 use std::error::Error;
 
 use reqwest;
+use regex::Regex;
 
 use super::market::Market;
 use super::film::Film;
@@ -339,6 +340,30 @@ impl Cinema {
                 },
             },
        ] 
+    }
+
+    pub fn to_cinema_id(cinema_id: &str) -> Option<String> {
+        lazy_static! {
+             static ref RE: Regex =
+                 Regex::new(r"^\d+$") // only digits
+                     .unwrap();
+        }
+
+        // if it's a match, then return it back
+        if RE.is_match(cinema_id) {
+            return Some(String::from(cinema_id));
+        }
+
+        // otherwise we need to look the thing up
+        match Cinema::list()
+            .iter()
+            .find(|c| c.slug == cinema_id) {
+                Some(c) => {
+                    let cinema_id = c.id.clone();
+                    Some(cinema_id)
+                },
+                None => None,
+            }
     }
 
     pub fn from_calendar_file(path: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {

@@ -14,19 +14,21 @@ use clap::{ArgMatches};
 
 pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
+    let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
     if let Some(film_type) = matches.value_of("type") {
-        list_filtered_films_for(cinema_id, film_type);    
+        list_filtered_films_for(&cinema_id, film_type);
     } else {
-        list_films_for(cinema_id);
+        list_films_for(&cinema_id);
     }
 }
 
 pub fn subcommand_cinema(matches: &ArgMatches) {
     match matches.value_of("cinema_id") {
-        Some(cinema_id) => { 
+        Some(cinema_id) => {
             // the user passed a cinema ID
             // so find that cinema and print it.
+            let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
             print_cinema_info(&cinema);
         },
@@ -39,9 +41,10 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
 
 pub fn subcommand_get(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
+    let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
-    if let Ok(_) = Cinema::sync_file(cinema_id) {
-        let path = db::calendar_path_for_cinema_id(cinema_id);
+    if let Ok(_) = Cinema::sync_file(&cinema_id) {
+        let path = db::calendar_path_for_cinema_id(&cinema_id);
         let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
         println!("Synced {} {}", cinema.id, cinema.name);
@@ -121,7 +124,7 @@ fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
             for film in films.iter() {
                 if film.show_type.to_lowercase() == film_type.to_lowercase() {
                     println!("{}", film.name);
-                } 
+                }
             }
         },
         None => {
