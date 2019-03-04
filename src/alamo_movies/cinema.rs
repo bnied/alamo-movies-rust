@@ -339,7 +339,7 @@ impl Cinema {
                     slug: String::from("nyc"),
                 },
             },
-       ] 
+       ]
     }
 
     pub fn to_cinema_id(cinema_id: &str) -> Option<String> {
@@ -401,7 +401,7 @@ impl Cinema {
     }
 
     pub fn get_calendar_data(cinema_id: &str) -> Result<String, Box<Error>>  {
-        let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id); 
+        let url: &str = &format!("https://feeds.drafthouse.com/adcService/showtimes.svc/calendar/{}/", cinema_id);
 
         let body = reqwest::get(url)?
             .text()?;

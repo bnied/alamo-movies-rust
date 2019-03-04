@@ -47,7 +47,7 @@ mod tests {
             panic!("fail");
         }
     }
-    
+
     #[test]
     fn parses_movie_with_type_and_symbols() {
         if let Some(film_title) = FilmTitle::parse("Weird Wednesday: KNIFE + HEART in 35mm") {
@@ -111,7 +111,5 @@ impl FilmTitle {
                 })
             }
         }
-        
-        
     }
 }

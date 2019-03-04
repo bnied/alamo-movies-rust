@@ -17,7 +17,7 @@ impl InvalidCinemaFile {
 impl fmt::Display for InvalidCinemaFile {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Invalid cinema file: {}", self.path)
-    } 
+    }
 
 }
 
@@ -38,7 +38,7 @@ pub struct InvalidCinemaData;
 impl fmt::Display for InvalidCinemaData {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Invalid cinema data.")
-    } 
+    }
 
 }
 
@@ -69,7 +69,7 @@ impl NoCalendarFile {
 impl fmt::Display for NoCalendarFile {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "File does not exist: {}", self.path)
-    } 
+    }
 
 }
 
@@ -92,7 +92,7 @@ pub struct ExpiredCalendarFile {
 impl ExpiredCalendarFile {
     pub fn from_date_time(created_at: &str) -> ExpiredCalendarFile {
         ExpiredCalendarFile {
-           created_at: String::from(created_at), 
+           created_at: String::from(created_at),
         }
     }
 }
@@ -100,7 +100,7 @@ impl ExpiredCalendarFile {
 impl fmt::Display for ExpiredCalendarFile {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Calendar data is expired: {}", self.created_at)
-    } 
+    }
 
 }
 

@@ -77,7 +77,7 @@ fn is_calendar_file(path: PathBuf) -> bool {
 /// Given a cinema ID,
 /// construct a path to a the json file in the db directory
 pub fn calendar_path_for_cinema_id(cinema_id: &str) -> PathBuf {
-    // the db directory is ~/.alamo-movies/db 
+    // the db directory is ~/.alamo-movies/db
     let mut filename = String::from(cinema_id);
     filename.push_str(".calendar.json");
 
