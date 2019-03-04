@@ -409,13 +409,13 @@ impl Cinema {
         Ok(body)
     }
 
-    pub fn sync_file(cinema_id: &str) -> Result<(), Box<dyn Error>> {
+    pub fn sync_file(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let body = Cinema::get_calendar_data(cinema_id)?;
 
         // validate:
-        Cinema::from_calendar_data(&body)?;
+        let result = Cinema::from_calendar_data(&body)?;
 
-        let result = db::write_calendar_file(cinema_id, &body)?;
+        db::write_calendar_file(cinema_id, &body)?;
 
         Ok(result)
     }
