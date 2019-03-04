@@ -76,6 +76,10 @@ pub fn subcommand_get_all(matches: &ArgMatches) {
                 },
             }
         }
+
+        if error_count > 0 {
+            exit(1);
+        }
     } else {
         // fetch everything
         println!("not implemented");
