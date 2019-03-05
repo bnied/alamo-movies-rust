@@ -143,8 +143,10 @@ fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
 
 fn list_films_for(cinema_id: &str) {
     match load_or_sync_cinema_for_id(cinema_id) {
-        Some((_cinema, films)) => {
+        Some((_cinema, mut films)) => {
             // list it out
+            films.sort_by(|a,b| a.name.cmp(&b.name));
+
             for film in films.iter() {
                 println!("{}", film.name);
             }
@@ -158,8 +160,10 @@ fn list_films_for(cinema_id: &str) {
 
 fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
     match load_or_sync_cinema_for_id(cinema_id) {
-        Some((_cinema, films)) => {
+        Some((_cinema, mut films)) => {
             // list it out
+            films.sort_by(|a,b| a.name.cmp(&b.name));
+
             for film in films.iter() {
                 if film.show_type.to_lowercase() == film_type.to_lowercase() {
                     println!("{}", film.name);
