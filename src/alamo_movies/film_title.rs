@@ -70,6 +70,28 @@ mod tests {
         }
     }
 
+    #[test]
+    fn parses_movie_with_projection_and_type_and_symbols_and_numbers() {
+        if let Some(film_title) = FilmTitle::parse("Terror Tuesday: 2D FINAL DESTINATION 2") {
+            assert_eq!(film_title.show_type, "Terror Tuesday");
+            assert_eq!(film_title.title, "FINAL DESTINATION 2");
+            assert_eq!(film_title.suffix, "");
+        } else {
+            panic!("fail");
+        }
+    }
+
+    #[test]
+    fn parses_movie_with_projection_type() {
+        if let Some(film_title) = FilmTitle::parse("3D FINAL DESTINATION 2") {
+            assert_eq!(film_title.show_type, "");
+            assert_eq!(film_title.title, "FINAL DESTINATION 2");
+            assert_eq!(film_title.suffix, "");
+        } else {
+            panic!("fail");
+        }
+    }
+
 }
 
 pub struct FilmTitle {
@@ -82,7 +104,7 @@ impl FilmTitle {
     pub fn parse(title: &str) -> Option<FilmTitle> {
         lazy_static! {
              static ref RE: Regex =
-                 Regex::new(r"^(([^:]+[a-z]+):\s+)?([^a-z]+)(\s(.*[a-z].*))?$")
+                 Regex::new(r"^(?:([^:]+[a-z]+):\s+)?(?:2D\s+|3D\s+)?([^a-z]+)(?:\s+(.*[a-z].*))?$")
                      .unwrap();
         }
 
@@ -96,13 +118,13 @@ impl FilmTitle {
             }), // no match, so return nothing.
             Some(cap) => {
                 //eprintln!("captures: {:?}", cap);
-                // 2 - type
-                // 3 - name
-                // 5 - suffix
+                // 1 - type
+                // 2 - name
+                // 3 - suffix
 
-                let show_type = String::from(cap.get(2).map_or("", |c| c.as_str()));
-                let title = String::from(cap.get(3).map_or("", |c| c.as_str()));
-                let suffix = String::from(cap.get(5).map_or("", |c| c.as_str()));
+                let show_type = String::from(cap.get(1).map_or("", |c| c.as_str()));
+                let title = String::from(cap.get(2).map_or("", |c| c.as_str()));
+                let suffix = String::from(cap.get(3).map_or("", |c| c.as_str()));
 
                 Some(FilmTitle {
                     title,
