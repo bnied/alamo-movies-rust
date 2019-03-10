@@ -187,10 +187,7 @@ fn print_cinema_info(cinema: &Cinema) {
 }
 
 fn print_cinema_list(matches: &ArgMatches) {
-
-    let local_only: bool = matches.occurrences_of("local") > 0;
-
-    if local_only {
+    if matches.is_present("local") {
         let db_path = db::base_directory_path();
 
         if ! db_path.is_dir() {
