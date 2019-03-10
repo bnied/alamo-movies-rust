@@ -7,12 +7,10 @@ use std::process::exit;
 use std::path::PathBuf;
 use std::fs;
 use std::error::Error;
+
 use chrono::{DateTime, Utc};
-use std::thread;
-use std::sync::mpsc;
-
-
 use clap::{ArgMatches};
+use rayon::prelude::*;
 
 pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
@@ -199,30 +197,17 @@ fn print_cinema_list(matches: &ArgMatches) {
             return;
         }
 
-        let (tx, rx) = mpsc::channel();
-
         let cinema_ids = db::list_cinema_ids(db_path);
-        let chunks: Vec<_> = cinema_ids.chunks(4).map(|c| c.to_owned()).collect();
-
-        for chunk in chunks {
-            let async_tx = mpsc::Sender::clone(&tx);
-
-            thread::spawn(move || {
-                for cinema_id in chunk {
-                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
-                    // eprintln!("in thread: {}", cinema.name);
-                    async_tx.send(cinema).unwrap();
-                }
-            });
-        }
-
-        drop(tx); // drop this guy so it's not left hanging open.
 
         let mut cinemas: Vec<Cinema> =
-            rx.iter().map(|cinema: Cinema| {
-                cinema
-            })
-            .collect();
+            cinema_ids
+                .par_iter()
+                .map(|cinema_id| {
+                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
+
+                    cinema
+                })
+                .collect();
 
         cinemas.sort_by(|a, b| a.id.cmp(&b.id));
 

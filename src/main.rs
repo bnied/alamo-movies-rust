@@ -6,6 +6,8 @@ extern crate regex;
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
+extern crate rayon;
+
 use crate::alamo_movies::cli;
 
 fn main() {
