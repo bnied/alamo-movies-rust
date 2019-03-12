@@ -9,7 +9,9 @@ use super::film::Film;
 use super::db;
 use super::error::{InvalidCinemaData};
 
-#[derive(Clone)]
+use serde::{Serialize};
+
+#[derive(Clone, Serialize)]
 pub struct Cinema {
     pub id: String,
     pub name: String,

@@ -16,3 +16,4 @@ clap = "2.32.0"
 reqwest = "0.9.10"
 chrono = "0.4.6"
 rayon = "1.0.3"
+serde = { version = "1.0.89", features = ["derive"] }

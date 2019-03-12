@@ -1,7 +1,9 @@
 use serde_json;
 use std::error::Error;
 
-#[derive(Clone)]
+use serde::{Serialize};
+
+#[derive(Clone, Serialize)]
 pub struct Market {
     pub id: String,
     pub name: String,

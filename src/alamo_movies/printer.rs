@@ -11,6 +11,13 @@ pub fn list_films(films: &Vec<Film>) {
     }
 }
 
+pub fn json_list_films(films: &Vec<Film>) {
+    match serde_json::to_string(films) {
+        Ok(json) => println!("{}", json),
+        _ => panic!("whoops"),
+    }
+}
+
 pub fn cinema_info(cinema: &Cinema) {
     println!("{cinema_id} [{cinema_slug}] {cinema_name} ({market})",
         cinema_id = cinema.id,

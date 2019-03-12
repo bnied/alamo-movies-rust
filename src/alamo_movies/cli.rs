@@ -26,7 +26,7 @@ pub fn subcommand_films(matches: &ArgMatches) {
     };
 
     if as_json {
-        eprintln!("no json yet");
+        printer::json_list_films(&films);
     } else {
         printer::list_films(&films);
     }

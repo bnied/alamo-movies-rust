@@ -8,6 +8,9 @@ use clap::{Arg, App, SubCommand};
 
 extern crate rayon;
 
+extern crate serde_json;
+extern crate serde;
+
 use crate::alamo_movies::cli;
 
 fn main() {

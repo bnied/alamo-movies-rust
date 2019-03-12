@@ -3,7 +3,9 @@ use std::collections::HashSet;
 
 use super::film_title::FilmTitle;
 
-#[derive(Clone)]
+use serde::{Serialize};
+
+#[derive(Clone, Serialize)]
 pub struct Film {
     pub id: String,
     pub name: String,
