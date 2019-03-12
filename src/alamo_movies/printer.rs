@@ -27,8 +27,23 @@ pub fn cinema_info(cinema: &Cinema) {
     );
 }
 
+pub fn json_cinema_info(cinema: &Cinema) {
+    match serde_json::to_string(cinema) {
+        Ok(json) => println!("{}", json),
+        _ => panic!("whoops"),
+    }
+}
+
 pub fn list_cinemas(cinemas: &Vec<Cinema>) {
     for cinema in cinemas {
         cinema_info(cinema);
     }
 }
+
+pub fn json_list_cinemas(cinemas: &Vec<Cinema>) {
+    match serde_json::to_string(cinemas) {
+        Ok(json) => println!("{}", json),
+        _ => panic!("whoops"),
+    }
+}
+

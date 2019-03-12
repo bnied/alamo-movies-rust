@@ -33,19 +33,31 @@ pub fn subcommand_films(matches: &ArgMatches) {
 }
 
 pub fn subcommand_cinema(matches: &ArgMatches) {
+    let as_json = matches.is_present("json");
+
     match matches.value_of("cinema_id") {
         Some(cinema_id) => {
             // the user passed a cinema ID
             // so find that cinema and print it.
             let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
-            printer::cinema_info(&cinema);
+
+            if as_json {
+                printer::json_cinema_info(&cinema);
+            } else {
+                printer::cinema_info(&cinema);
+            }
         },
         None => {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
             let cinemas = get_cinema_list(matches);
-            printer::list_cinemas(&cinemas);
+
+            if as_json {
+                printer::json_list_cinemas(&cinemas);
+            } else {
+                printer::list_cinemas(&cinemas);
+            }
         }
     }
 }
