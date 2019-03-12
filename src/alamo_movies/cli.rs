@@ -3,6 +3,7 @@ use super::film::Film;
 use super::db;
 use super::error::{NoCalendarFile, ExpiredCalendarFile};
 use super::printer;
+use super::printer::Format;
 
 use std::process::exit;
 use std::path::PathBuf;
@@ -17,7 +18,7 @@ pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
     let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
-    let as_json = matches.is_present("json");
+    let format = format_for_match(matches);
 
     let films = if let Some(film_type) = matches.value_of("type") {
         filtered_films_for(&cinema_id, film_type)
@@ -25,15 +26,11 @@ pub fn subcommand_films(matches: &ArgMatches) {
         films_for(&cinema_id)
     };
 
-    if as_json {
-        printer::json_list_films(&films);
-    } else {
-        printer::list_films(&films);
-    }
+    printer::list_films(&films, &format);
 }
 
 pub fn subcommand_cinema(matches: &ArgMatches) {
-    let as_json = matches.is_present("json");
+    let format = format_for_match(matches);
 
     match matches.value_of("cinema_id") {
         Some(cinema_id) => {
@@ -42,22 +39,14 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
             let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
 
-            if as_json {
-                printer::json_cinema_info(&cinema);
-            } else {
-                printer::cinema_info(&cinema);
-            }
+            printer::cinema_info(&cinema, &format);
         },
         None => {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
             let cinemas = get_cinema_list(matches);
 
-            if as_json {
-                printer::json_list_cinemas(&cinemas);
-            } else {
-                printer::list_cinemas(&cinemas);
-            }
+            printer::list_cinemas(&cinemas, &format);
         }
     }
 }
@@ -112,6 +101,14 @@ pub fn subcommand_get_all(matches: &ArgMatches) {
 
     if error_count > 0 {
         exit(1);
+    }
+}
+
+fn format_for_match(matches: &ArgMatches) -> Format {
+    if matches.is_present("json") {
+        Format::Json
+    } else {
+        Format::Text
     }
 }
 
