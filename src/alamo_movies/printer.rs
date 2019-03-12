@@ -5,7 +5,7 @@ pub fn film_info(film: &Film) {
     println!("{}", film.name);
 }
 
-pub fn film_list(films: &Vec<Film>) {
+pub fn list_films(films: &Vec<Film>) {
     for film in films.iter() {
         film_info(film);
     }
@@ -20,7 +20,7 @@ pub fn cinema_info(cinema: &Cinema) {
     );
 }
 
-pub fn cinema_list(cinemas: &Vec<Cinema>) {
+pub fn list_cinemas(cinemas: &Vec<Cinema>) {
     for cinema in cinemas {
         cinema_info(cinema);
     }

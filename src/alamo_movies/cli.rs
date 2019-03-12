@@ -17,10 +17,18 @@ pub fn subcommand_films(matches: &ArgMatches) {
     let cinema_id = matches.value_of("cinema_id").unwrap();
     let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
-    if let Some(film_type) = matches.value_of("type") {
-        list_filtered_films_for(&cinema_id, film_type);
+    let as_json = matches.is_present("json");
+
+    let films = if let Some(film_type) = matches.value_of("type") {
+        filtered_films_for(&cinema_id, film_type)
     } else {
-        list_films_for(&cinema_id);
+        films_for(&cinema_id)
+    };
+
+    if as_json {
+        eprintln!("no json yet");
+    } else {
+        printer::list_films(&films);
     }
 }
 
@@ -37,7 +45,7 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
             let cinemas = get_cinema_list(matches);
-            printer::cinema_list(&cinemas);
+            printer::list_cinemas(&cinemas);
         }
     }
 }
@@ -95,6 +103,7 @@ pub fn subcommand_get_all(matches: &ArgMatches) {
     }
 }
 
+// XXX this should be a Result and not exit.
 fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
     let path = db::calendar_path_for_cinema_id(cinema_id);
 
@@ -144,37 +153,36 @@ fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn list_films_for(cinema_id: &str) {
+fn films_for(cinema_id: &str) -> Vec<Film> {
     match load_or_sync_cinema_for_id(cinema_id) {
         Some((_cinema, mut films)) => {
             // list it out
             films.sort_by(|a,b| a.name.cmp(&b.name));
 
-            printer::film_list(&films);
+            films
         },
         None => {
             eprintln!("Failed to load cinema file.");
-            exit(1);
+            vec![]
         }
     }
 }
 
-fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
+fn filtered_films_for(cinema_id: &str, film_type: &str) -> Vec<Film> {
     match load_or_sync_cinema_for_id(cinema_id) {
         Some((_cinema, mut films)) => {
             // list it out
             films.sort_by(|a,b| a.name.cmp(&b.name));
 
-            for film in films.iter() {
-                if film.show_type.to_lowercase() == film_type.to_lowercase() {
-                    println!("{}", film.name);
-                }
-            }
+            films.iter()
+                .filter(|f| f.show_type.to_lowercase() == film_type.to_lowercase() )
+                .cloned()
+                .collect()
         },
         None => {
             eprintln!("Failed to load cinema file.");
-            exit(1);
-        }
+            vec![]
+        },
     }
 }
 
