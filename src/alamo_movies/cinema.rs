@@ -9,6 +9,7 @@ use super::film::Film;
 use super::db;
 use super::error::{InvalidCinemaData};
 
+#[derive(Clone)]
 pub struct Cinema {
     pub id: String,
     pub name: String,

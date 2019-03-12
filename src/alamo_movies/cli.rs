@@ -2,6 +2,7 @@ use super::cinema::Cinema;
 use super::film::Film;
 use super::db;
 use super::error::{NoCalendarFile, ExpiredCalendarFile};
+use super::printer;
 
 use std::process::exit;
 use std::path::PathBuf;
@@ -30,12 +31,14 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
             // so find that cinema and print it.
             let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
             let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
-            print_cinema_info(&cinema);
+            printer::cinema_info(&cinema);
         },
-        None =>
+        None => {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
-            print_cinema_list(matches),
+            let cinemas = get_cinema_list(matches);
+            printer::cinema_list(&cinemas);
+        }
     }
 }
 
@@ -47,7 +50,7 @@ pub fn subcommand_get(matches: &ArgMatches) {
         let path = db::calendar_path_for_cinema_id(&cinema_id);
         let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
 
-        println!("Synced {} {}", cinema.id, cinema.name);
+        eprintln!("Synced {} {}", cinema.id, cinema.name);
     } else {
         panic!("Error");
     }
@@ -147,9 +150,7 @@ fn list_films_for(cinema_id: &str) {
             // list it out
             films.sort_by(|a,b| a.name.cmp(&b.name));
 
-            for film in films.iter() {
-                println!("{}", film.name);
-            }
+            printer::film_list(&films);
         },
         None => {
             eprintln!("Failed to load cinema file.");
@@ -177,21 +178,12 @@ fn list_filtered_films_for(cinema_id: &str, film_type: &str) {
     }
 }
 
-fn print_cinema_info(cinema: &Cinema) {
-    println!("{cinema_id} [{cinema_slug}] {cinema_name} ({market})",
-        cinema_id = cinema.id,
-        cinema_slug = cinema.slug,
-        cinema_name = cinema.name,
-        market = cinema.market.name,
-    );
-}
-
-fn print_cinema_list(matches: &ArgMatches) {
+fn get_cinema_list(matches: &ArgMatches) -> Vec<Cinema> {
     if matches.is_present("local") {
         let db_path = db::base_directory_path();
 
         if ! db_path.is_dir() {
-            return;
+            return vec![];
         }
 
         let cinema_ids = db::list_cinema_ids(db_path);
@@ -208,15 +200,10 @@ fn print_cinema_list(matches: &ArgMatches) {
 
         cinemas.sort_by(|a, b| a.id.cmp(&b.id));
 
-        for cinema in cinemas.iter() {
-            print_cinema_info(&cinema);
-        }
+        cinemas
     } else {
         // print out the built-in cinema list
-        let cinemas = Cinema::list();
-
-        for cinema in cinemas.iter() {
-            print_cinema_info(cinema);
-        }
+        Cinema::list().to_vec()
     }
 }
+

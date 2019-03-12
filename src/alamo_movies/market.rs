@@ -1,6 +1,7 @@
 use serde_json;
 use std::error::Error;
 
+#[derive(Clone)]
 pub struct Market {
     pub id: String,
     pub name: String,
