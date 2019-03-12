@@ -3,6 +3,7 @@ name = "alamo-movies"
 version = "0.1.0"
 authors = ["Spike Grobstein <me@spike.cx>"]
 edition = "2018"
+license = "MIT"
 
 [[bin]]
 name = "adc"
