@@ -348,9 +348,9 @@ impl Cinema {
 
     pub fn to_cinema_id(cinema_id: &str) -> Option<String> {
         lazy_static! {
-             static ref RE: Regex =
-                 Regex::new(r"^\d+$") // only digits
-                     .unwrap();
+            static ref RE: Regex =
+                Regex::new(r"^\d+$") // only digits
+                    .unwrap();
         }
 
         // if it's a match, then return it back
@@ -359,15 +359,16 @@ impl Cinema {
         }
 
         // otherwise we need to look the thing up
-        match Cinema::list()
-            .iter()
-            .find(|c| c.slug == cinema_id) {
-                Some(c) => {
-                    let cinema_id = c.id.clone();
-                    Some(cinema_id)
-                },
-                None => None,
-            }
+        let cinemas = Cinema::list();
+
+        let cinema_id =
+            cinemas.iter()
+                .find(|c| c.slug == cinema_id);
+        
+        match cinema_id {
+            Some(c) => Some(c.id.clone()),
+            None => None,
+        }
     }
 
     pub fn from_calendar_file(path: &PathBuf) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
@@ -379,12 +380,9 @@ impl Cinema {
         let v: serde_json::Value = serde_json::from_str(data)?;
 
         match &v["Calendar"]["Cinemas"][0] {
-            serde_json::Value::Null => {
-                Err(Box::new(InvalidCinemaData))
-            }
+            serde_json::Value::Null => Err(Box::new(InvalidCinemaData)),
             data => Cinema::from_calendar_json(data),
         }
-
     }
 
     pub fn from_calendar_json(json: &serde_json::Value) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
