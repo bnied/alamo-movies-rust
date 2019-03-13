@@ -11,10 +11,13 @@ extern crate rayon;
 extern crate serde_json;
 extern crate serde;
 
+use std::process::exit;
+use std::error::Error;
+
 use crate::alamo_movies::cli;
 
 fn main() {
-    let matches = App::new("adc")
+    let app = App::new("adc")
         .version("0.1.0")
         .author("Spike Grobstein <me@spike.cx>")
         .about("Query the Alamo Drafthouse schedule to get lists of upcoming films playing in theaters.")
@@ -74,19 +77,29 @@ fn main() {
                          )
                     )
         .after_help("adc is in no way affiliated with the Alamo Drafthouse Cinemas.\n\
-                     I'm just a huge fan.")
-        .get_matches();
+                     I'm just a huge fan.");
 
-    if let Some(matches) = matches.subcommand_matches("films") {
-        cli::subcommand_films(matches);
-    } else if let Some(matches) = matches.subcommand_matches("cinema") {
-        cli::subcommand_cinema(matches);
-    } else if let Some(matches) = matches.subcommand_matches("get") {
-        cli::subcommand_get(matches);
-    } else if let Some(matches) = matches.subcommand_matches("get-all") {
-        cli::subcommand_get_all(matches);
+    if let Err(error) = run(app) {
+        eprintln!("Error: {}", error);
+        exit(1);
     }
 }
 
+fn run(app: App) -> Result<(), Box<dyn Error>> {
+    let matches = app.get_matches();
+
+    if let Some(matches) = matches.subcommand_matches("films") {
+        cli::subcommand_films(matches)
+    } else if let Some(matches) = matches.subcommand_matches("cinema") {
+        cli::subcommand_cinema(matches)
+    } else if let Some(matches) = matches.subcommand_matches("get") {
+        cli::subcommand_get(matches)
+    } else if let Some(matches) = matches.subcommand_matches("get-all") {
+        cli::subcommand_get_all(matches)
+    } else {
+        // we should not get this far.
+        Ok(())
+    }
+}
 
 

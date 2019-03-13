@@ -5,7 +5,6 @@ use super::error::{NoCalendarFile, ExpiredCalendarFile};
 use super::printer;
 use super::printer::Format;
 
-use std::process::exit;
 use std::path::PathBuf;
 use std::fs;
 use std::error::Error;
@@ -14,22 +13,24 @@ use chrono::{DateTime, Utc};
 use clap::{ArgMatches};
 use rayon::prelude::*;
 
-pub fn subcommand_films(matches: &ArgMatches) {
+pub fn subcommand_films(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let cinema_id = matches.value_of("cinema_id").unwrap();
     let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
     let format = format_for_match(matches);
 
     let films = if let Some(film_type) = matches.value_of("type") {
-        filtered_films_for(&cinema_id, film_type)
+        filtered_films_for(&cinema_id, film_type)?
     } else {
-        films_for(&cinema_id)
+        films_for(&cinema_id)?
     };
 
     printer::list_films(&films, &format);
+
+    Ok(())
 }
 
-pub fn subcommand_cinema(matches: &ArgMatches) {
+pub fn subcommand_cinema(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let format = format_for_match(matches);
 
     match matches.value_of("cinema_id") {
@@ -37,35 +38,37 @@ pub fn subcommand_cinema(matches: &ArgMatches) {
             // the user passed a cinema ID
             // so find that cinema and print it.
             let cinema_id = Cinema::to_cinema_id(&cinema_id).unwrap();
-            let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
+            let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id)?;
 
             printer::cinema_info(&cinema, &format);
         },
         None => {
             // the user did not pass a cinema ID
             // so print a list of all cinemas (with other args we got)
-            let cinemas = get_cinema_list(matches);
+            let cinemas = get_cinema_list(matches)?;
 
             printer::list_cinemas(&cinemas, &format);
         }
     }
+
+    Ok(())
 }
 
-pub fn subcommand_get(matches: &ArgMatches) {
+pub fn subcommand_get(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let cinema_id = matches.value_of("cinema_id").unwrap();
     let cinema_id = Cinema::to_cinema_id(cinema_id).unwrap();
 
-    if let Ok(_) = Cinema::sync_file(&cinema_id) {
-        let path = db::calendar_path_for_cinema_id(&cinema_id);
-        let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap()).expect("cannot load file");
+    Cinema::sync_file(&cinema_id)?;
 
-        eprintln!("Synced {} {}", cinema.id, cinema.name);
-    } else {
-        panic!("Error");
-    }
+    let path = db::calendar_path_for_cinema_id(&cinema_id);
+    let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap())?;
+
+    eprintln!("Synced {} {}", cinema.id, cinema.name);
+
+    Ok(())
 }
 
-pub fn subcommand_get_all(matches: &ArgMatches) {
+pub fn subcommand_get_all(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let cinema_ids =
         if matches.is_present("update-only") {
             // only update the local files
@@ -73,7 +76,7 @@ pub fn subcommand_get_all(matches: &ArgMatches) {
 
             if ! path.is_dir() {
                 eprintln!("No local cinema data to update.");
-                return;
+                return Ok(());
             }
 
             db::list_cinema_ids(path)
@@ -84,24 +87,19 @@ pub fn subcommand_get_all(matches: &ArgMatches) {
                 .collect()
         };
 
-    let mut error_count = 0;
-
     for cinema_id in cinema_ids.iter() {
-        error_count = error_count + match Cinema::sync_file(cinema_id) {
+        match Cinema::sync_file(cinema_id) {
             Err(error) => {
                 eprintln!("Failed to sync cinema {}: {}", cinema_id, error);
-                1
+                return Err(error);
             },
             Ok((cinema, _films)) => {
                 eprintln!("Synced cinema {} {}", cinema.id, cinema.name);
-                0
             },
         }
     }
 
-    if error_count > 0 {
-        exit(1);
-    }
+    Ok(())
 }
 
 fn format_for_match(matches: &ArgMatches) -> Format {
@@ -112,8 +110,7 @@ fn format_for_match(matches: &ArgMatches) -> Format {
     }
 }
 
-// XXX this should be a Result and not exit.
-fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
+fn load_or_sync_cinema_for_id(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
     let path = db::calendar_path_for_cinema_id(cinema_id);
 
     if let Err(_) = check_local_file(&path) {
@@ -121,19 +118,13 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Option<(Cinema, Vec<Film>)> {
             Err(error) => {
                 eprintln!("Failed to download cinema data for cinema with ID {}: {}", cinema_id, error);
                 eprintln!("Is this a valid cinema ID?");
-                exit(1);
+                return Err(error);
             },
             _ => eprintln!("Synced file for cinema via API."),
         }
     }
 
-    match Cinema::from_calendar_file(path.to_str().unwrap()) {
-        Err(error) => {
-            eprintln!("Error: {}", error);
-            exit(1);
-        },
-        Ok(result) => Some(result),
-    }
+    Ok(Cinema::from_calendar_file(path.to_str().unwrap())?)
 }
 
 fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
@@ -162,45 +153,34 @@ fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn films_for(cinema_id: &str) -> Vec<Film> {
-    match load_or_sync_cinema_for_id(cinema_id) {
-        Some((_cinema, mut films)) => {
-            // list it out
-            films.sort_by(|a,b| a.name.cmp(&b.name));
+fn films_for(cinema_id: &str) -> Result<Vec<Film>, Box<dyn Error>> {
+    let (_cinema, mut films) = load_or_sync_cinema_for_id(cinema_id)?;
 
-            films
-        },
-        None => {
-            eprintln!("Failed to load cinema file.");
-            vec![]
-        }
-    }
+    // list it out
+    films.sort_by(|a,b| a.name.cmp(&b.name));
+
+    Ok(films)
 }
 
-fn filtered_films_for(cinema_id: &str, film_type: &str) -> Vec<Film> {
-    match load_or_sync_cinema_for_id(cinema_id) {
-        Some((_cinema, mut films)) => {
-            // list it out
-            films.sort_by(|a,b| a.name.cmp(&b.name));
+fn filtered_films_for(cinema_id: &str, film_type: &str) -> Result<Vec<Film>, Box<dyn Error>> {
+    let (_cinema, mut films) = load_or_sync_cinema_for_id(cinema_id)?;
 
-            films.iter()
-                .filter(|f| f.show_type.to_lowercase() == film_type.to_lowercase() )
-                .cloned()
-                .collect()
-        },
-        None => {
-            eprintln!("Failed to load cinema file.");
-            vec![]
-        },
-    }
+    // list it out
+    films.sort_by(|a,b| a.name.cmp(&b.name));
+
+    Ok(films.iter()
+        .filter(|f| f.show_type.to_lowercase() == film_type.to_lowercase() )
+        .cloned()
+        .collect()
+        )
 }
 
-fn get_cinema_list(matches: &ArgMatches) -> Vec<Cinema> {
+fn get_cinema_list(matches: &ArgMatches) -> Result<Vec<Cinema>, Box<dyn Error>> {
     if matches.is_present("local") {
         let db_path = db::base_directory_path();
 
         if ! db_path.is_dir() {
-            return vec![];
+            return Ok(vec![]);
         }
 
         let cinema_ids = db::list_cinema_ids(db_path);
@@ -209,18 +189,17 @@ fn get_cinema_list(matches: &ArgMatches) -> Vec<Cinema> {
             cinema_ids
                 .par_iter()
                 .map(|cinema_id| {
-                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to load cinema file.");
-
+                    let (cinema, _films) = load_or_sync_cinema_for_id(&cinema_id).expect("Failed to get cinema");
                     cinema
                 })
                 .collect();
 
         cinemas.sort_by(|a, b| a.id.cmp(&b.id));
 
-        cinemas
+        Ok(cinemas)
     } else {
         // print out the built-in cinema list
-        Cinema::list().to_vec()
+        Ok(Cinema::list().to_vec())
     }
 }
 

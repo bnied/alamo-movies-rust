@@ -369,6 +369,7 @@ impl Cinema {
             }
     }
 
+    // TODO this should be a &PathBuf
     pub fn from_calendar_file(path: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
         let contents = fs::read_to_string(path)?;
         Cinema::from_calendar_data(&contents)
