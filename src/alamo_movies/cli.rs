@@ -61,7 +61,7 @@ pub fn subcommand_get(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     Cinema::sync_file(&cinema_id)?;
 
     let path = db::calendar_path_for_cinema_id(&cinema_id);
-    let (cinema, _films) = Cinema::from_calendar_file(path.to_str().unwrap())?;
+    let (cinema, _films) = Cinema::from_calendar_file(&path)?;
 
     eprintln!("Synced {} {}", cinema.id, cinema.name);
 
@@ -124,7 +124,7 @@ fn load_or_sync_cinema_for_id(cinema_id: &str) -> Result<(Cinema, Vec<Film>), Bo
         }
     }
 
-    Ok(Cinema::from_calendar_file(path.to_str().unwrap())?)
+    Ok(Cinema::from_calendar_file(&path)?)
 }
 
 fn check_local_file(path: &PathBuf) -> Result<(), Box<dyn Error>> {

@@ -1,5 +1,6 @@
 use std::fs;
 use std::error::Error;
+use std::path::PathBuf;
 
 use reqwest;
 use regex::Regex;
@@ -369,9 +370,8 @@ impl Cinema {
             }
     }
 
-    // TODO this should be a &PathBuf
-    pub fn from_calendar_file(path: &str) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
-        let contents = fs::read_to_string(path)?;
+    pub fn from_calendar_file(path: &PathBuf) -> Result<(Cinema, Vec<Film>), Box<dyn Error>> {
+        let contents = fs::read_to_string(path.to_str().unwrap())?;
         Cinema::from_calendar_data(&contents)
     }
 
