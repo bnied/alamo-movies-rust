@@ -1,7 +1,7 @@
 use super::cinema::Cinema;
 use super::film::Film;
 use super::db;
-use super::error::{NoCalendarFile, ExpiredCalendarFile};
+use super::error::{NoLocalCinemaData, NoCalendarFile, ExpiredCalendarFile};
 use super::printer;
 use super::printer::Format;
 
@@ -75,8 +75,7 @@ pub fn subcommand_get_all(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
             let path = db::base_directory_path();
 
             if ! path.is_dir() {
-                eprintln!("No local cinema data to update.");
-                return Ok(());
+                return Err(Box::new(NoLocalCinemaData));
             }
 
             db::list_cinema_ids(path)

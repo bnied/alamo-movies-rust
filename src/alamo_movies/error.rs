@@ -114,3 +114,24 @@ impl error::Error for ExpiredCalendarFile {
         None
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct NoLocalCinemaData;
+
+impl fmt::Display for NoLocalCinemaData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "There is no local cinema data to update. Try fetching some data first with `adc films <cinema-id>`")
+    }
+
+}
+
+impl error::Error for NoLocalCinemaData {
+    fn description(&self) -> &str {
+        "no local cinema data"
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        // Generic error, underlying cause isn't tracked.
+        None
+    }
+}
