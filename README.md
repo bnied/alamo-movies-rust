@@ -63,8 +63,9 @@ subcommand:
 $ adc films 0801
 ```
 
-`adc` will download and cache the cinema response for up to 24 hours (cache is stored in `~/.alamo/db/` by
-default), so repeated use of the same cinema will not hammer their API.
+`adc` will download and cache the cinema response for up to 24 hours (cache is stored in `~/.alamo/` by
+default), so repeated use of the same cinema will not hammer their API. You can customize the location of this
+directory by setting the environment variable `ADC_DATA_DIR`.
 
 You can also filter films from a theatre by type. For example, to only view the current Terror Tuesday
 showings:

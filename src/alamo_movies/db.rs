@@ -7,16 +7,22 @@ use std::error::Error;
 use regex::Regex;
 
 pub fn base_directory_path() -> PathBuf {
+    let path = match env::var("ADC_DATA_DIR") {
+        Ok(path) => PathBuf::from(path),
+        _ => default_data_directory(),
+    };
+
+    path.join("db")
+}
+
+pub fn default_data_directory() -> PathBuf {
     let home_dir = match env::var("HOME") {
         Ok(home) => home,
         _ => String::from(""),
     };
 
-    let path = PathBuf::from(home_dir)
+    PathBuf::from(home_dir)
         .join(".alamo")
-        .join("db");
-
-    path
 }
 
 pub fn ensure_base_directory_exists() -> Result<(), Box<dyn Error>> {
